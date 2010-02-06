@@ -49,7 +49,7 @@ module FourInfo
     Config = YAML.load(ERB.new(File.read(config_file)).render)['4info']
 
     def confirm(number)
-      xml = template(:confirm).render(Config.merge(:number => number))
+      xml = template(:confirm).render(Config.merge(:number => format_number(number)))
       puts xml
       put(xml)
     end
@@ -58,6 +58,19 @@ module FourInfo
       file = Templates.detect {|t| File.basename(t).chomp('.haml') == name}
       raise ArgumentError, "Missing 4Info template: #{name}" unless file
       Haml::Engine.new(File.read(file))
+    end
+
+    def format_number(number)
+      case number.size
+      when 10
+        "+1#{number}"
+      when 11
+        "+#{number}"
+      when 12
+        number.to_s
+      else
+        raise ArgumentError, "Number is not a valid 10-digit number: #{number.inspect}"
+      end
     end
   end
 end
