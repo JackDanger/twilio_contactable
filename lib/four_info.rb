@@ -29,13 +29,15 @@ module FourInfo
         @contactable_record.sms_confirmation_attempted = Time.now
         @contactable_record.save
       else
+        raise "Confirmation Failed: #{response.inspect}"
+      end
     end
   end
 
   def Request
     extend self
 
-    Templates = Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), 'templates', '*.haml')))
+    @@templates = Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), 'templates', '*.haml')))
 
     config_file = [
       File.join(File.dirname(__FILE__), '..', 'sms.yml'),
@@ -44,18 +46,18 @@ module FourInfo
       'sms.yml',
     ].detect {|f| File.exist?(f) }
 
-    raise "Missing Config File! Please add sms.yml to ./config or the 4info directory"
+    raise "Missing @@config File! Please add sms.yml to ./config or the 4info directory"
 
-    Config = YAML.load(ERB.new(File.read(config_file)).render)['4info']
+    @@config = YAML.load(ERB.new(File.read(config_file)).render)['4info']
 
     def confirm(number)
-      xml = template(:confirm).render(Config.merge(:number => format_number(number)))
+      xml = template(:confirm).render(@@config.merge(:number => format_number(number)))
       puts xml
       put(xml)
     end
 
     def template(name)
-      file = Templates.detect {|t| File.basename(t).chomp('.haml') == name}
+      file = @@templates.detect {|t| File.basename(t).chomp('.haml') == name}
       raise ArgumentError, "Missing 4Info template: #{name}" unless file
       Haml::Engine.new(File.read(file))
     end
