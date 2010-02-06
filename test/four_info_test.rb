@@ -5,8 +5,8 @@ class FourInfoTest < ActiveSupport::TestCase
 
   context "contactable record" do
     setup { @user = User.create }
-    should "have number column" do
-      assert @user.columns.detect {|c| c.name == 'number'}
+    should "have phone column" do
+      assert @user.attribute_names.detect {|a| 'phone' == a}
     end
   end
 
