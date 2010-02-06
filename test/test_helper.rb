@@ -18,5 +18,6 @@ end
 
 
 class User < ActiveRecord::Base
+  include FourInfo::Contactable
 end
 
