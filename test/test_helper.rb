@@ -1,6 +1,7 @@
 require 'rubygems'
 gem 'test-unit'
 require 'test/unit'
+require 'shoulda'
 require 'active_support'
 require 'active_record'
 require 'active_support/test_case'
