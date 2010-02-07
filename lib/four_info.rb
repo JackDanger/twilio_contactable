@@ -3,11 +3,26 @@
 module FourInfo
   module Contactable
 
-    # The contactable record should have the following columns:
-    #   phone (string, integer)
-    #   sms_confirmed (boolean)
-    #   sms_confirmation_attempted (datetime)
-    #   sms_confirmation_code (string)
+    Attributes = [  :sms_phone_number,
+                    :sms_confirmation_code,
+                    :sms_confirmation_attempted,
+                    :sms_confirmed ]
+
+    def self.included(model)
+      Attributes.each do |attribute|
+        # add a method for setting or retrieving
+        # which column should be used for which attribute
+        # 
+        # :sms_phone_number_column defaults to :sms_phone_number, etc.
+        model.instance_eval "
+          def #{attribute}_column(value = nil)
+            @#{attribute}_column ||= :#{attribute}
+            @#{attribute}_column = value if value
+            @#{attribute}_column
+          end
+        "
+      end
+    end
 
     def confirm_sms!
       Confirmation.new(phone, self).try
