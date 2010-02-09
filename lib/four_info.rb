@@ -24,7 +24,7 @@ module FourInfo
     end
   end
 
-  Gateway = 'http://gateway.4info.net/msg'
+  Gateway = URI.parse 'http://gateway.4info.net/msg'
 
   module Contactable
 
@@ -128,8 +128,10 @@ module FourInfo
     protected
 
       def perform_confirm(body)
-        proxy_address, proxy_port = config[:proxy].split(":")
-        Net::HTTP::Proxy(proxy_address, proxy_port).start(Gateway) do |http|
+        net = config[:proxy].blank? ?
+                Net::HTTP :
+                Net::HTTP::Proxy(*config[:proxy].split(":"))
+        net.start(Gateway.host) do |http|
           http.post(body)
         end
       end
