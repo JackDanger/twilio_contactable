@@ -66,13 +66,6 @@ class FourInfoTest < ActiveSupport::TestCase
           assert_equal number, FourInfo.internationalize(number)
         end
       end
-      should "leave 12 digit numbers unchanged" do
-        [ '+' + ('3'*11),
-          '+' + ('8'*11),
-          '+' + ('4'*11) ].each do |number|
-          assert_equal number, FourInfo.internationalize(number)
-        end
-      end
       should "return nil for all bad numbers" do
         assert_equal nil, FourInfo.internationalize(nil)
         assert_equal nil, FourInfo.internationalize('nil')
