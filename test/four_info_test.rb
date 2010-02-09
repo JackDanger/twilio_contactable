@@ -32,12 +32,11 @@ class FourInfoTest < ActiveSupport::TestCase
     end
     context "when phone number exists" do
       setup { @user.sms_phone_number = "206-555-5555"}
-        should "save confirmation number in proper attribute" do
-          assert @user.send(User.sms_confirmation_code_column)
-        end
-        should_change "stored code" do
-          @user.send User.sms_confirmation_code_column
-        end
+      should "save confirmation number in proper attribute" do
+        assert @user.send(User.sms_confirmation_code_column)
+      end
+      should_change "stored code" do
+        @user.send User.sms_confirmation_code_column
       end
     end
   end
