@@ -2,6 +2,7 @@ require 'rubygems'
 gem 'test-unit'
 require 'test/unit'
 require 'shoulda'
+require 'mocha'
 require 'active_support'
 require 'active_record'
 require 'active_support/test_case'
@@ -25,3 +26,12 @@ class User < ActiveRecord::Base
   include FourInfo::Contactable
 end
 
+# kill all network access
+module FourInfo
+  class Request
+    def start
+      Response.new(:success => true,
+                   :confirmation_code => 'FAKE')
+    end
+  end
+end

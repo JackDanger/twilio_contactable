@@ -125,14 +125,38 @@ module FourInfo
       Haml::Engine.new(File.read(file))
     end
 
+    class Response
+      attr_accessor :success
+      alias_method :success?, :success
+      def initialize(attrs = {})
+        attrs.each do |key, value|
+          self.instance_variable_set "@#{key}", value
+        end
+      end
+
+      def method_missing(method_name, *args, &block)
+        if ivar = instance_variable_get("@#{method_name}")
+          ivar
+        else
+          super
+        end
+      end
+    end
+
     protected
 
       def perform_confirm(body)
+        start do |http|
+          http.post body
+        end
+      end
+
+      def start
         net = config[:proxy].blank? ?
                 Net::HTTP :
                 Net::HTTP::Proxy(*config[:proxy].split(":"))
         net.start(Gateway.host) do |http|
-          http.post(body)
+          yield http
         end
       end
   end
