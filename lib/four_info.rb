@@ -64,9 +64,11 @@ module FourInfo
       'sms.yml',
     ].detect {|f| File.exist?(f) }
 
-    raise "Missing @@config File! Please add sms.yml to ./config or the 4info directory"
+    @@config = :live == FourInfo.mode ?
+                YAML.load(ERB.new(File.read(config_file)).render)['4info'] :
+                
 
-    @@config = YAML.load(ERB.new(File.read(config_file)).render)['4info']
+    raise "Missing config File! Please add sms.yml to ./config or the 4info directory" unless @@config
 
     def confirm(number)
       xml = template(:confirm).render(@@config.merge(:number => format_number(number)))
