@@ -4,14 +4,17 @@ class FourInfoTest < ActiveSupport::TestCase
 
   context "contactable record" do
     FourInfo::Contactable::Attributes.each do |attribute|
+      setup {
+        @klass = Class.new
+        @klass.send :include, FourInfo::Contactable
+      }
+      should "begin with appropriate default for #{attribute}_column" do
+        assert_equal attribute, @klass.send("#{attribute}_column")
+      end
       should "allow setting #{attribute}_column" do
-        # check for appropriate default
-        assert_equal attribute, User.send("#{attribute}_column")
-
-        # set to new value
-        new_column_name = :new_column
-        User.send "#{attribute}_column", new_column_name
-        assert_equal new_column_name, User.send("#{attribute}_column")
+        new_column_name = :custom_column
+        @klass.send "#{attribute}_column", new_column_name
+        assert_equal new_column_name, @klass.send("#{attribute}_column")
       end
     end
   end
