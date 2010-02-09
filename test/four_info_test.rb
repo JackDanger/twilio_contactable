@@ -2,7 +2,7 @@ require 'test_helper'
 
 class FourInfoTest < ActiveSupport::TestCase
 
-  context "contactable record" do
+  context "contactable class" do
     setup {
       @klass = Class.new
       @klass.send :include, FourInfo::Contactable
@@ -15,6 +15,21 @@ class FourInfoTest < ActiveSupport::TestCase
         new_column_name = :custom_column
         @klass.send "#{attribute}_column", new_column_name
         assert_equal new_column_name, @klass.send("#{attribute}_column")
+      end
+    end
+  end
+
+  context "contactable instance" do
+    setup {
+      @user = User.new
+    }
+    context "confirming phone number" do
+      setup { @user.confirm_sms! }
+      should "save confirmation number in proper attribute" do
+        assert @user.send(User.sms_confirmation_code_column)
+      end
+      should_change "stored code" do
+        @user.send User.sms_confirmation_code_column
       end
     end
   end
