@@ -80,7 +80,7 @@ module FourInfo
     end
 
     def template(name)
-      file = @@templates.detect {|t| File.basename(t).chomp('.haml') == name}
+      file = @@templates.detect {|t| File.basename(t).chomp('.haml').to_sym == name.to_sym }
       raise ArgumentError, "Missing 4Info template: #{name}" unless file
       Haml::Engine.new(File.read(file))
     end
