@@ -94,6 +94,9 @@ module FourInfo
         'sms.yml'
     ]
 
+    attr_accessor :config
+    attr_accessor :number
+
     def initialize
       config_file = :test == FourInfo.mode ?
                       @@test_mode_config_file :
@@ -105,9 +108,10 @@ module FourInfo
     end
 
     def confirm(number)
-      xml = template(:confirm).render(@config.merge(:number => FourInfo.internationalize(number)))
-      puts xml
-      put(xml)
+      self.number = FourInfo.internationalize(number)
+
+      xml = template(:confirm).render(self)
+      p xml
     end
 
     def template(name)

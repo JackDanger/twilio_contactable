@@ -1,6 +1,6 @@
 !!! xml 1.0
-%request{ :clientId => client_id, :client_key => client_key, :type => "VALIDATION" }
+%request{ :clientId => config[:client_id], :client_key => config[:client_key], :type => "VALIDATION" }
   %validation
     %recipient
       %type= 5
-      %id= number
+      %id= config[:number]
