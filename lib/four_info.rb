@@ -70,7 +70,7 @@ module FourInfo
 
       raise "Missing config File! Please add sms.yml to ./config or the 4info directory" unless config_file
 
-      @config = YAML.load(File.read(config_file).render)['4info']
+      @config = YAML.load(File.read(config_file))['4info']
     end
 
     def confirm(number)
