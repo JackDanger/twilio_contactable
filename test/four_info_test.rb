@@ -3,11 +3,11 @@ require 'test_helper'
 class FourInfoTest < ActiveSupport::TestCase
 
   context "contactable record" do
+    setup {
+      @klass = Class.new
+      @klass.send :include, FourInfo::Contactable
+    }
     FourInfo::Contactable::Attributes.each do |attribute|
-      setup {
-        @klass = Class.new
-        @klass.send :include, FourInfo::Contactable
-      }
       should "begin with appropriate default for #{attribute}_column" do
         assert_equal attribute, @klass.send("#{attribute}_column")
       end
