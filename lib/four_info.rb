@@ -104,14 +104,14 @@ module FourInfo
 
       raise "Missing config File! Please add sms.yml to ./config or the 4info directory" unless config_file
 
-      @config = YAML.load(File.read(config_file))['4info']
+      @config = YAML.load(File.read(config_file))['4info'].with_indifferent_access
     end
 
     def confirm(number)
       self.number = FourInfo.internationalize(number)
 
       xml = template(:confirm).render(self)
-      p xml
+      STDOUT.puts xml
     end
 
     def template(name)
