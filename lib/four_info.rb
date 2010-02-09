@@ -1,4 +1,5 @@
-
+gem 'haml'
+require 'haml'
 
 module FourInfo
   def self.mode;     @@mode ||= :live; end
