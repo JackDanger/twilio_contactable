@@ -23,13 +23,23 @@ class FourInfoTest < ActiveSupport::TestCase
     setup {
       @user = User.new
     }
-    context "confirming phone number" do
-      setup { @user.confirm_sms! }
-      should "save confirmation number in proper attribute" do
-        assert @user.send(User.sms_confirmation_code_column)
+    context "when phone number is blank" do
+      setup { @user.sms_phone_number = nil}
+      context "confirming phone number" do
+        setup { @user.confirm_sms! }
+        should_not_change "any attributes" do
+          @user.attributes.inspect
+        end
       end
-      should_change "stored code" do
-        @user.send User.sms_confirmation_code_column
+    end
+    context "when phone number exists" do
+      setup { @user.sms_phone_number = "206-555-5555"}
+        should "save confirmation number in proper attribute" do
+          assert @user.send(User.sms_confirmation_code_column)
+        end
+        should_change "stored code" do
+          @user.send User.sms_confirmation_code_column
+        end
       end
     end
   end
