@@ -68,7 +68,7 @@ module FourInfo
 
     raise "Missing config File! Please add sms.yml to ./config or the 4info directory" unless config_file
 
-    @@config = YAML.load(ERB.new(File.read(config_file)).render)['4info']
+    @@config = YAML.load(File.read(config_file).render)['4info']
 
     def confirm(number)
       xml = template(:confirm).render(@@config.merge(:number => format_number(number)))
