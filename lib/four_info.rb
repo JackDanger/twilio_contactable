@@ -58,7 +58,7 @@ module FourInfo
     end
 
     def confirm_sms!
-      Confirmation.new(phone, self).try
+      Confirmation.new(four_info_sms_phone_number, self).try
     end
   end
 
