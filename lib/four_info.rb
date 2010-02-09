@@ -1,5 +1,6 @@
 gem 'haml'
 require 'haml'
+require 'net/http'
 
 module FourInfo
   def self.mode;     @@mode ||= :live; end
@@ -22,6 +23,8 @@ module FourInfo
       nil
     end
   end
+
+  Gateway = 'http://gateway.4info.net/msg'
 
   module Contactable
 
@@ -111,7 +114,9 @@ module FourInfo
       self.number = FourInfo.internationalize(number)
 
       xml = template(:confirm).render(self)
-      STDOUT.puts xml
+      response = perform_confirm(xml)
+      STDOUT.puts response.inspect
+      response
     end
 
     def template(name)
@@ -119,5 +124,14 @@ module FourInfo
       raise ArgumentError, "Missing 4Info template: #{name}" unless file
       Haml::Engine.new(File.read(file))
     end
+
+    protected
+
+      def perform_confirm(body)
+        proxy_address, proxy_port = config[:proxy].split(":")
+        Net::HTTP::Proxy(proxy_address, proxy_port).start(Gateway) do |http|
+          http.post(body)
+        end
+      end
   end
 end

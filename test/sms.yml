@@ -1,4 +1,4 @@
 4info:
   client_id:  1
   client_key: ABCDEFG
-  proxy:      255.255.255.255
+  proxy:      255.255.255.255:101
