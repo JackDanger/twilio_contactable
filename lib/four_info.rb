@@ -41,7 +41,7 @@ module FourInfo
     def try
       return true if @contactable_record.sms_confirmed?
 
-      response = Request.confirm(@number)
+      response = Request.new.confirm(@number)
       if response.success?
         @contactable_record.sms_confirmation_code = response.confirmation_code
         @contactable_record.sms_confirmation_attempted = Time.now
@@ -63,8 +63,8 @@ module FourInfo
         'sms.yml'
     ]
 
-    def initialize(mode)
-      config_file = :test == mode ?
+    def initialize
+      config_file = :test == FourInfo.mode ?
                       @@test_mode_config_file :
                       @@likely_config_files.detect {|f| File.exist?(f) }
 
