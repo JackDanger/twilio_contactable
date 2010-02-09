@@ -5,6 +5,10 @@ module FourInfo
   def self.mode;     @@mode ||= :live; end
   def self.mode=(m); @@mode = m;      end
 
+  def self.numerize(number)
+    number.to_s.scan(/\d+/).join
+  end
+
   module Contactable
 
     Attributes = [  :sms_phone_number,
@@ -35,12 +39,13 @@ module FourInfo
 
   class Confirmation
     def initialize(number, contactable_record)
-      @number = number
+      @number = FourInfo.numerize(number)
       @contactable_record = contactable_record
     end
 
     def try
-      return true if @contactable_record.sms_confirmed?
+      return true  if @contactable_record.sms_confirmed?
+      return false if @number.blank?
 
       response = Request.new.confirm(@number)
       if response.success?
