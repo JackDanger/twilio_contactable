@@ -57,7 +57,7 @@ module FourInfo
 
     @@templates = Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), 'templates', '*.haml')))
 
-    config_file = :live == FourInfo.mode ?
+    config_file = :test == FourInfo.mode ?
                     File.join(File.dirname(__FILE__), 'sms.yml') :
                     [
                       File.join(File.dirname(__FILE__), '..', 'sms.yml'),
