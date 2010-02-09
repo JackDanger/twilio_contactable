@@ -45,10 +45,10 @@ class FourInfoTest < ActiveSupport::TestCase
   context "standardizing numbers" do
     context "to digits" do
       should "remove all but integers" do
-        assert_equal '12345', FourInfo.numberize('1-2-3-4-5')
-        assert_equal '12345', FourInfo.numberize('1 2 3 4 5')
-        assert_equal '12345', FourInfo.numberize('1,2(3)4.5')
-        assert_equal '12345', FourInfo.numberize('1,2(3)4.5')
+        assert_equal '12345', FourInfo.numerize('1-2-3-4-5')
+        assert_equal '12345', FourInfo.numerize('1 2 3 4 5')
+        assert_equal '12345', FourInfo.numerize('1,2(3)4.5')
+        assert_equal '12345', FourInfo.numerize('1,2(3)4.5')
       end
     end
     context "to international format" do
