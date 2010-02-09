@@ -1,8 +1,8 @@
 
 
 module FourInfo
-  def self.mode;     @mode || :live; end
-  def self.mode=(m); @mode = m;      end
+  def self.mode;     @@mode ||= :live; end
+  def self.mode=(m); @@mode = m;      end
 
   module Contactable
 
@@ -52,26 +52,29 @@ module FourInfo
     end
   end
 
-  module Request
-    extend self
+  class Request
 
     @@templates = Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), 'templates', '*.haml')))
+    @@test_mode_config_file = File.join(File.dirname(__FILE__), '..', 'test', 'sms.yml')
+    @@likely_config_files = [
+        File.join(File.dirname(__FILE__), '..', 'sms.yml'),
+        defined?(Rails) ? File.join(Rails.root, 'config', 'sms.yml') : '',
+        File.join('config', 'sms.yml'),
+        'sms.yml'
+    ]
 
-    config_file = :test == FourInfo.mode ?
-                    File.join(File.dirname(__FILE__), 'sms.yml') :
-                    [
-                      File.join(File.dirname(__FILE__), '..', 'sms.yml'),
-                      defined?(Rails) ? File.join(Rails.root, 'config', 'sms.yml') : '',
-                      File.join('config', 'sms.yml'),
-                      'sms.yml',
-                    ].detect {|f| File.exist?(f) }
+    def initialize(mode)
+      config_file = :test == mode ?
+                      @@test_mode_config_file :
+                      @@likely_config_files.detect {|f| File.exist?(f) }
 
-    raise "Missing config File! Please add sms.yml to ./config or the 4info directory" unless config_file
+      raise "Missing config File! Please add sms.yml to ./config or the 4info directory" unless config_file
 
-    @@config = YAML.load(File.read(config_file).render)['4info']
+      @config = YAML.load(File.read(config_file).render)['4info']
+    end
 
     def confirm(number)
-      xml = template(:confirm).render(@@config.merge(:number => format_number(number)))
+      xml = template(:confirm).render(@config.merge(:number => format_number(number)))
       puts xml
       put(xml)
     end
