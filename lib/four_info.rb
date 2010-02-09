@@ -43,6 +43,17 @@ module FourInfo
             @#{attribute}_column
           end
         "
+        # provide a helper method to access the right value
+        # no matter which column it's stored in
+        #
+        # e.g.: @user.four_info_sms_confirmed
+        #       => @user.send(User.sms_confirmed_column)
+        model.class_eval "
+          def four_info_#{attribute}
+            send self.class.#{attribute}_column
+          end
+          alias_method :four_info_#{attribute}?, :four_info_#{attribute}
+        "
       end
     end
 
@@ -58,7 +69,7 @@ module FourInfo
     end
 
     def try
-      return true  if @contactable_record.sms_confirmed?
+      return true  if @contactable_record.four_info_sms_confirmed?
       return false if @number.blank?
 
       response = Request.new.confirm(@number)
