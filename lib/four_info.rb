@@ -1,6 +1,9 @@
 
 
 module FourInfo
+  def self.mode;     @mode || :live; end
+  def self.mode=(m); @mode = m;      end
+
   module Contactable
 
     Attributes = [  :sms_phone_number,
@@ -49,7 +52,7 @@ module FourInfo
     end
   end
 
-  def Request
+  module Request
     extend self
 
     @@templates = Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), 'templates', '*.haml')))
