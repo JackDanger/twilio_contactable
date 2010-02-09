@@ -5,8 +5,22 @@ module FourInfo
   def self.mode;     @@mode ||= :live; end
   def self.mode=(m); @@mode = m;      end
 
-  def self.numerize(number)
-    number.to_s.scan(/\d+/).join
+  def self.numerize(numberish)
+    numberish.to_s.scan(/\d+/).join
+  end
+
+  def self.internationalize(given_number)
+    number = numerize(given_number)
+    case number.size
+    when 10
+      "+1#{number}"
+    when 11
+      "+#{number}"
+    when 12
+      number =~ /\+\d(11)/ ? number : nil
+    else
+      nil
+    end
   end
 
   module Contactable
@@ -80,7 +94,7 @@ module FourInfo
     end
 
     def confirm(number)
-      xml = template(:confirm).render(@config.merge(:number => format_number(number)))
+      xml = template(:confirm).render(@config.merge(:number => FourInfo.internationalize(number)))
       puts xml
       put(xml)
     end
@@ -89,19 +103,6 @@ module FourInfo
       file = @@templates.detect {|t| File.basename(t).chomp('.haml').to_sym == name.to_sym }
       raise ArgumentError, "Missing 4Info template: #{name}" unless file
       Haml::Engine.new(File.read(file))
-    end
-
-    def format_number(number)
-      case number.size
-      when 10
-        "+1#{number}"
-      when 11
-        "+#{number}"
-      when 12
-        number.to_s
-      else
-        raise ArgumentError, "Number is not a valid 10-digit number: #{number.inspect}"
-      end
     end
   end
 end
