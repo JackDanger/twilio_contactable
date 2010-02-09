@@ -57,18 +57,18 @@ module FourInfo
 
     @@templates = Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), 'templates', '*.haml')))
 
-    config_file = [
-      File.join(File.dirname(__FILE__), '..', 'sms.yml'),
-      defined?(Rails) ? File.join(Rails.root, 'config', 'sms.yml') : '',
-      File.join('config', 'sms.yml'),
-      'sms.yml',
-    ].detect {|f| File.exist?(f) }
+    config_file = :live == FourInfo.mode ?
+                    File.join(File.dirname(__FILE__), 'sms.yml') :
+                    [
+                      File.join(File.dirname(__FILE__), '..', 'sms.yml'),
+                      defined?(Rails) ? File.join(Rails.root, 'config', 'sms.yml') : '',
+                      File.join('config', 'sms.yml'),
+                      'sms.yml',
+                    ].detect {|f| File.exist?(f) }
 
-    @@config = :live == FourInfo.mode ?
-                YAML.load(ERB.new(File.read(config_file)).render)['4info'] :
-                
+    raise "Missing config File! Please add sms.yml to ./config or the 4info directory" unless config_file
 
-    raise "Missing config File! Please add sms.yml to ./config or the 4info directory" unless @@config
+    @@config = YAML.load(ERB.new(File.read(config_file)).render)['4info']
 
     def confirm(number)
       xml = template(:confirm).render(@@config.merge(:number => format_number(number)))
