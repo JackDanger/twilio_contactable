@@ -58,7 +58,18 @@ module FourInfo
     end
 
     def confirm_sms!
-      Confirmation.new(four_info_sms_phone_number, self).try
+      return true  if four_info_sms_confirmed?
+      return false if four_info_sms_phone_number.blank?
+
+      response = FourInfo::Request.new.confirm(four_info_sms_phone_number)
+      if response.success?
+        self.four_info_sms_confirmation_code = response.confirmation_code
+        self.four_info_sms_confirmation_attempted = Time.now
+        save
+      else
+        # "Confirmation Failed: #{response['message'].inspect}"
+        false
+      end
     end
   end
 
@@ -85,28 +96,6 @@ module FourInfo
 
   Gateway = URI.parse 'http://gateway.4info.net:8080/msg'
 
-  class Confirmation
-    def initialize(number, contactable_record)
-      @number = FourInfo.numerize(number)
-      @contactable_record = contactable_record
-    end
-
-    def try
-      return true  if @contactable_record.four_info_sms_confirmed?
-      return false if @number.blank?
-
-      response = Request.new.confirm(@number)
-      if response.success?
-        @contactable_record.four_info_sms_confirmation_code = response.confirmation_code
-        @contactable_record.four_info_sms_confirmation_attempted = Time.now
-        @contactable_record.save
-        true
-      else
-        # "Confirmation Failed: #{response.inspect}"
-        false
-      end
-    end
-  end
 
   class Request
 
