@@ -111,6 +111,18 @@ class FourInfoContactableTest < ActiveSupport::TestCase
         end
       end
     end
+    context "when the number is blocked" do
+      setup {
+        @user.four_info_sms_blocked = true
+        @user.save!
+      }
+      context "sending a message" do
+        setup { @result = @user.send_sms!('message') }
+        should "send nothing" do
+          assert_equal false, @result
+        end
+      end
+    end
     context "when the number is confirmed" do
       setup {
         FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)

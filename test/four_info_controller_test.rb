@@ -17,8 +17,12 @@ class FourInfoControllerTest < ActionController::TestCase
   context "receiving BLOCK" do
     setup {
       post :index,
+      # this is what an xml request will parse to:
       "request"=>{"block"=>{"recipient"=>{"property"=>{"name"=>"CARRIER", "value"=>"3"}, "id"=>"+5553334444", "type"=>"5"}}}
     }
     should_respond_with :success
+    should "call " do
+      
+    end
   end
 end

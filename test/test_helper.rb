@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(:version => 1) do
   create_table :users do |t|
     t.column :sms_phone_number,           :string
     t.column :sms_confirmed,              :boolean
+    t.column :sms_blocked,                :boolean
     t.column :sms_confirmation_attempted, :datetime
     t.column :sms_confirmation_code,      :string
   end

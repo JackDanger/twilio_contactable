@@ -2,6 +2,7 @@ module FourInfo
   module Contactable
 
     Attributes = [  :sms_phone_number,
+                    :sms_blocked,
                     :sms_confirmation_code,
                     :sms_confirmation_attempted,
                     :sms_confirmed ]
@@ -44,7 +45,7 @@ module FourInfo
       if msg.to_s.size > 160 && !allow_multiple
         raise ArgumentError, "SMS Message is too long. Either specify that you want multiple messages or shorten the string."
       end
-      return false if msg.to_s.strip.blank? || !four_info_sms_confirmed?
+      return false if msg.to_s.strip.blank? || four_info_sms_blocked? || !four_info_sms_confirmed?
 
       msg.to_s.scan(/.{1,160}/m).map do |text|
         FourInfo::Request.new.deliver_message(text, four_info_sms_phone_number).success?
@@ -52,6 +53,7 @@ module FourInfo
     end
 
     def confirm_sms!
+      return false if four_info_sms_blocked?
       return true  if four_info_sms_confirmed?
       return false if four_info_sms_phone_number.blank?
 
