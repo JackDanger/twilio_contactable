@@ -52,7 +52,10 @@ class FourInfoContactableTest < ActiveSupport::TestCase
   end
 
   context "contactable instance" do
-    setup { @user = User.create! :sms_phone_number => '555-555-5555' }
+    setup {
+      User.delete_all
+      @user = User.create! :sms_phone_number => '555-555-5555'
+    }
 
     context "when phone number is blank" do
       setup { @user.sms_phone_number = nil}
@@ -189,7 +192,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
           assert @worked
         end
         should_change "blocked attribute" do
-          @user.sms_blocked
+          @user.reload.sms_blocked
         end
       end
     end
