@@ -42,13 +42,13 @@ module FourInfo
       Response.new(perform(xml))
     end
 
-    def template(name)
-      file = @@templates.detect {|t| File.basename(t).chomp('.haml').to_sym == name.to_sym }
-      raise ArgumentError, "Missing 4Info template: #{name}" unless file
-      Haml::Engine.new(File.read(file))
-    end
-
     protected
+
+      def template(name)
+        file = @@templates.detect {|t| File.basename(t).chomp('.haml').to_sym == name.to_sym }
+        raise ArgumentError, "Missing 4Info template: #{name}" unless file
+        Haml::Engine.new(File.read(file))
+      end
 
       def perform(body)
         STDOUT.puts('in perform')
