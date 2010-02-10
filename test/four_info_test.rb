@@ -45,8 +45,8 @@ class FourInfoTest < ActiveSupport::TestCase
   end
 
   context "contactable instance" do
-
     setup { @user = User.first }
+
     context "when phone number is blank" do
       setup { @user.sms_phone_number = nil}
       context "confirming phone number" do
