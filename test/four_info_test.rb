@@ -18,7 +18,16 @@ class FourInfoTest < ActiveSupport::TestCase
     <message>Success</message>
   </status>
 </response>'
-
+  SendMsgError = '<?xml version="1.0" ?>
+<request clientId="123" clientKey="32IFJ23OFIJIWR" type="MESSAGE">
+  <message>
+    <recipient>
+      <type>5</type>
+      <id>+16505551212</id>
+    </recipient>
+    <text>Test message.</text>
+  </message>
+</request>'
 
   context "contactable class" do
     setup {
@@ -53,13 +62,31 @@ class FourInfoTest < ActiveSupport::TestCase
       context "confirming phone number" do
         setup {
           FourInfo::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
-          @user.confirm_sms!
+          @worked = @user.confirm_sms!
         }
+        should "work" do
+          assert @worked
+        end
         should "save confirmation number in proper attribute" do
           assert @user.send(User.sms_confirmation_code_column)
         end
         should_change "stored code" do
           @user.send User.sms_confirmation_code_column
+        end
+      end
+      context "confirming phone number when the confirmation fails for some reason" do
+        setup {
+          FourInfo::Request.any_instance.stubs(:perform).returns(ValidationError)
+          @worked = @user.confirm_sms!
+        }
+        should "not work" do
+          assert !@worked
+        end
+        should "not save confirmation number" do
+          assert @user.four_info_sms_confirmation_code.blank?
+        end
+        should_not_change "stored code" do
+          @user.four_info_sms_confirmation_code
         end
       end
     end
