@@ -133,6 +133,7 @@ module FourInfo
 
     class Response
       def initialize(xml)
+        gem 'hpricot'
         require 'hpricot'
         @body = Hpricot.parse(xml)
       end
