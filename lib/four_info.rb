@@ -42,15 +42,10 @@ module FourInfo
     end
 
     def send_sms!(msg, allow_multiple = false)
-      if msg.to_s.strip.blank?
-        raise "SMS Message is blank"
-      end
       if msg.to_s.size > 160 && !allow_multiple
         raise "SMS Message is too long. Either specify that you want multiple messages or shorten the string."
       end
-      unless four_info_sms_confirmed?
-        raise "Mobile number has not yet been confirmed, can't send message"
-      end
+      return false if msg.to_s.strip.blank? || !four_info_sms_confirmed?
 
       msg.to_s.scan(/.{1,160}/m).map do |text|
         FourInfo::Request.new.deliver_message(text, four_info_sms_phone_number).success?
