@@ -64,9 +64,7 @@ class FourInfoTest < ActiveSupport::TestCase
           FourInfo::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
           @worked = @user.confirm_sms!
         }
-        should "work" do
-          assert @worked
-        end
+        should "work" do assert @worked end
         should "save confirmation number in proper attribute" do
           assert @user.send(User.sms_confirmation_code_column)
         end
@@ -79,9 +77,7 @@ class FourInfoTest < ActiveSupport::TestCase
           FourInfo::Request.any_instance.stubs(:perform).returns(ValidationError)
           @worked = @user.confirm_sms!
         }
-        should "not work" do
-          assert !@worked
-        end
+        should "not work" do assert !@worked end
         should "not save confirmation number" do
           assert @user.four_info_sms_confirmation_code.blank?
         end
