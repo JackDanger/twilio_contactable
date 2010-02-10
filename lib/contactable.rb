@@ -68,5 +68,17 @@ module FourInfo
         false
       end
     end
+
+    def unblock_sms!
+      return false unless four_info_sms_blocked?
+
+      response = FourInfo::Request.new.unblock(four_info_sms_phone_number)
+      if response.success?
+        self.four_info_sms_blocked = false
+        save
+      else
+        false
+      end
+    end
   end  
 end

@@ -26,6 +26,13 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     <message>Success</message>
   </status>
 </response>'
+  UnblockSuccess = '<?xml version=”1.0” ?>
+<response>
+  <status>
+    <id>1</id>
+    <message>Success</message>
+  </status>
+</response>'
 
   context "contactable class" do
     setup {
@@ -153,6 +160,36 @@ class FourInfoContactableTest < ActiveSupport::TestCase
           should "send multiple messages" do
             assert_equal [true, true], @result
           end
+        end
+      end
+    end
+
+    context "when the number is not blocked" do
+      setup {
+        FourInfo::Request.any_instance.expects(:perform).never
+      }
+      context "unblocking" do
+        setup { @worked = @user.unblock_sms! }
+        should "not do anything" do
+          assert !@worked
+        end
+        should_not_change "any attributes" do
+          @user.attributes.inspect
+        end
+      end
+    end
+    context "when the number is blocked" do
+      setup {
+        FourInfo::Request.any_instance.stubs(:perform).returns(UnblockSuccess)
+        @user.update_attributes!(:sms_blocked => true)
+      }
+      context "unblocking" do
+        setup { @worked = @user.unblock_sms! }
+        should "work" do
+          assert @worked
+        end
+        should_change "blocked attribute" do
+          @user.sms_blocked
         end
       end
     end
