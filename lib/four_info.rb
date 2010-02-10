@@ -30,5 +30,6 @@ module FourInfo
 end
 
 require File.join(File.dirname(__FILE__), 'contactable')
+require File.join(File.dirname(__FILE__), 'controller')
 require File.join(File.dirname(__FILE__), 'request')
 require File.join(File.dirname(__FILE__), 'response')

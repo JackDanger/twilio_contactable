@@ -1,11 +1,11 @@
 require 'rubygems'
 gem 'test-unit'
 require 'test/unit'
-require 'shoulda'
 require 'mocha'
 require 'active_support'
 require 'active_record'
 require 'active_support/test_case'
+require 'shoulda'
 require File.join(File.dirname(__FILE__), "..", 'lib', 'four_info')
 
 FourInfo.mode = :test

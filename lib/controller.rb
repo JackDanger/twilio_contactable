@@ -1,18 +1,19 @@
 module FourInfo
   module Controller
     def index
-      process
+      recieve_xml
     end
 
     # in case this is hooked up as a RESTful route
     def create
-      process
+      recieve_xml
     end
 
     protected
 
-      def process
+      def recieve_xml
         STDOUT.puts params.inspect
+        render :text => response.inspect
       end
   end
 end
