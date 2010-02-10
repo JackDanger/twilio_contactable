@@ -60,6 +60,7 @@ module FourInfo
       if response.success?
         self.four_info_sms_confirmation_code = response.confirmation_code
         self.four_info_sms_confirmation_attempted = Time.now
+        self.four_info_sms_confirmed = true
         save
       else
         # "Confirmation Failed: #{response['message'].inspect}"

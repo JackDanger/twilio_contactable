@@ -45,7 +45,8 @@ class FourInfoTest < ActiveSupport::TestCase
   end
 
   context "contactable instance" do
-    setup { @user = User.new }
+
+    setup { @user = User.first }
     context "when phone number is blank" do
       setup { @user.sms_phone_number = nil}
       context "confirming phone number" do
@@ -62,6 +63,7 @@ class FourInfoTest < ActiveSupport::TestCase
         end
       end
     end
+
     context "when phone number exists" do
       setup { @user.sms_phone_number = "206-555-5555"}
       context "confirming phone number" do
@@ -71,10 +73,13 @@ class FourInfoTest < ActiveSupport::TestCase
         }
         should "work" do assert @worked end
         should "save confirmation number in proper attribute" do
-          assert @user.send(User.sms_confirmation_code_column)
+          assert @user.four_info_sms_confirmation_code
         end
         should_change "stored code" do
-          @user.send User.sms_confirmation_code_column
+          @user.four_info_sms_confirmation_code
+        end
+        should "set sms_confirmed? to true" do
+          assert @user.four_info_sms_confirmed?
         end
       end
       context "confirming phone number when the confirmation fails for some reason" do
@@ -88,6 +93,29 @@ class FourInfoTest < ActiveSupport::TestCase
         end
         should_not_change "stored code" do
           @user.four_info_sms_confirmation_code
+        end
+      end
+    end
+    context "when the number is not confirmed" do
+      context "sending a message" do
+        setup { @result = @user.send_sms!('message') }
+        should "send send no messages" do
+          assert_equal false, @result
+        end
+      end
+    end
+    context "when the number is confirmed" do
+      setup {
+        FourInfo::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
+        @user.confirm_sms!
+        p @user
+      }
+      context "sending a message" do
+        setup {
+          @result = @user.send_sms!('message')
+        }
+        should "send send exactly one message messages" do
+          assert_equal [true], @result
         end
       end
     end
