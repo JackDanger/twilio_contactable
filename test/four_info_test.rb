@@ -96,6 +96,7 @@ class FourInfoTest < ActiveSupport::TestCase
         end
       end
     end
+
     context "when the number is not confirmed" do
       context "sending a message" do
         setup { @result = @user.send_sms!('message') }
@@ -120,6 +121,7 @@ class FourInfoTest < ActiveSupport::TestCase
       end
     end
   end
+
 
   context "standardizing numbers" do
     context "to digits" do
