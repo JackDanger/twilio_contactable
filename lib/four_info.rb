@@ -1,7 +1,3 @@
-gem 'haml'
-require 'haml'
-require 'net/http'
-
 module FourInfo
   def self.mode;     @@mode ||= :live; end
   def self.mode=(m); @@mode = m;      end
@@ -24,7 +20,7 @@ module FourInfo
     end
   end
 
-  Gateway = URI.parse 'http://gateway.4info.net/msg'
+  Gateway = URI.parse 'http://gateway.4info.net:8080/msg'
 
   module Contactable
 
@@ -34,6 +30,10 @@ module FourInfo
                     :sms_confirmed ]
 
     def self.included(model)
+      gem 'haml'
+      require 'haml'
+      require 'net/http'
+
       Attributes.each do |attribute|
         # add a method for setting or retrieving
         # which column should be used for which attribute
@@ -114,9 +114,7 @@ module FourInfo
       self.number = FourInfo.internationalize(number)
 
       xml = template(:confirm).render(self)
-      response = perform_confirm(xml)
-      STDOUT.puts response.inspect
-      response
+      Response.new(perform(xml))
     end
 
     def template(name)
@@ -126,28 +124,31 @@ module FourInfo
     end
 
     class Response
-      attr_accessor :success
-      alias_method :success?, :success
-      def initialize(attrs = {})
-        attrs.each do |key, value|
-          self.instance_variable_set "@#{key}", value
-        end
+      def initialize(xml)
+        require 'hpricot'
+        @body = Hpricot.parse(xml)
       end
 
-      def method_missing(method_name, *args, &block)
-        if ivar = instance_variable_get("@#{method_name}")
-          ivar
-        else
-          super
-        end
+      def [](name)
+        nodes = (@body/name)
+        1 == nodes.size ? nodes.first : nodes
+      end
+
+      def success?
+        'Success' == self['message'].inner_text
+      end
+
+      def confirmation_code
+        self['confCode'].inner_text
       end
     end
 
     protected
 
-      def perform_confirm(body)
+      def perform(body)
+        STDOUT.puts('in perform')
         start do |http|
-          http.post body
+          http.post(Gateway.path, body).read_body
         end
       end
 
@@ -155,7 +156,7 @@ module FourInfo
         net = config[:proxy].blank? ?
                 Net::HTTP :
                 Net::HTTP::Proxy(*config[:proxy].split(":"))
-        net.start(Gateway.host) do |http|
+        net.start(Gateway.host, Gateway.port) do |http|
           yield http
         end
       end

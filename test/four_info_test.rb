@@ -2,6 +2,24 @@ require 'test_helper'
 
 class FourInfoTest < ActiveSupport::TestCase
 
+  ValidationError = '<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <status>
+    <id>4</id>
+    <message>Validation Error</message>
+  </status>
+</response>'
+  ValidationSuccess = '<?xml version=”1.0” ?>
+<response>
+  <requestId>F81D4FAE-7DEC-11D0-A765-00A0C91E6BF6</requestId>
+  <confCode>123abc</confCode>
+  <status>
+    <id>1</id>
+    <message>Success</message>
+  </status>
+</response>'
+
+
   context "contactable class" do
     setup {
       @klass = Class.new
@@ -33,7 +51,10 @@ class FourInfoTest < ActiveSupport::TestCase
     context "when phone number exists" do
       setup { @user.sms_phone_number = "206-555-5555"}
       context "confirming phone number" do
-        setup { @user.confirm_sms! }
+        setup {
+          FourInfo::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
+          @user.confirm_sms!
+        }
         should "save confirmation number in proper attribute" do
           assert @user.send(User.sms_confirmation_code_column)
         end
