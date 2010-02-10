@@ -41,6 +41,12 @@ module FourInfo
       end
     end
 
+    def send_sms!(msg, allow_multiple = false)
+      if msg.size > 160 && !allow_multiple
+        raise "SMS Message is too long. Either specify that you want multiple messages or shorten the string."
+      end
+    end
+
     def confirm_sms!
       Confirmation.new(four_info_sms_phone_number, self).try
     end
