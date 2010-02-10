@@ -20,6 +20,8 @@ ActiveRecord::Schema.define(:version => 1) do
     t.column :sms_blocked,                :boolean
     t.column :sms_confirmation_attempted, :datetime
     t.column :sms_confirmation_code,      :string
+
+    t.column :type, :string
   end
 end
 

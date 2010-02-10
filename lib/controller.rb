@@ -1,9 +1,13 @@
 module FourInfo
   module Controller
 
-    # the user should specify which class gets contacted
-    def self.contactable(klass)
-      @@contactable_class = klass
+    def self.included(controller)
+      controller.instance_eval do
+        # the user should specify which class gets contacted
+        def sms_contactable(klass)
+          @@contactable_class = klass
+        end
+      end
     end
 
     # the likely default
@@ -19,33 +23,40 @@ module FourInfo
     protected
 
       def recieve_xml
+
+        unless defined?(@@contactable_class)
+          raise RuntimeError, "Please define your user class in the FourInfo controller via the 'sms_contactable' method"
+        end
+
         request = params[:request]
         render :text => 'unknown format', :status => 500 and return unless request
-        case request[:type]
+        case request['type']
         when 'BLOCK'
           @contactable = find_contactable(request[:block][:recipient][:id])
           @contactable.four_info_sms_blocked = true
-          @contactable.save
+          @contactable.save!
         when 'MESSAGE'
           @contactable = find_contactable(request[:message][:sender][:id])
           if @contactable.respond_to?(:receive_sms)
             @contactable.receive_sms(request[:message][:text])
           else
-            warn "An SMS message was received by #{@@contactable_klass.name} doesn't have a receive_sms method!"
+            warn "An SMS message was received but #{@@contactable_class.name.inspect} doesn't have a receive_sms method!"
           end
         end
         render :text => 'OK', :status => 200
       end
 
       def find_contactable(id)
-        @@contactable_class.find(
-          :first,
-          :conditions => {
-            @@contactable_class.sms_phone_number_column => id
-          }
-        )
-      rescue => error
-        render :text => error.inspect
+        [id, id.sub(/^\+/,''), id.sub(/^\+1/,'')].each do |possible_phone_number|
+          found = @@contactable_class.find(
+            :first,
+            :conditions => 
+              { @@contactable_class.sms_phone_number_column => possible_phone_number }
+          )
+          return found if found
+        end
+      # rescue => error
+      #   render :text => error.inspect
       end
   end
 end
