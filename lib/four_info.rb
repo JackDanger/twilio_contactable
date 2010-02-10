@@ -52,10 +52,13 @@ module FourInfo
         # e.g.: @user.four_info_sms_confirmed
         #       => @user.send(User.sms_confirmed_column)
         model.class_eval "
-          def four_info_#{attribute}
-            send self.class.#{attribute}_column
+          def four_info_#{attribute}(value = nil)
+            value ?
+              send(self.class.#{attribute}_column.to_s+'=', value) :
+              send(self.class.#{attribute}_column)
           end
           alias_method :four_info_#{attribute}?, :four_info_#{attribute}
+          alias_method :four_info_#{attribute}=, :four_info_#{attribute}
         "
       end
     end
@@ -77,8 +80,8 @@ module FourInfo
 
       response = Request.new.confirm(@number)
       if response.success?
-        @contactable_record.sms_confirmation_code = response.confirmation_code
-        @contactable_record.sms_confirmation_attempted = Time.now
+        @contactable_record.four_info_sms_confirmation_code = response.confirmation_code
+        @contactable_record.four_info_sms_confirmation_attempted = Time.now
         @contactable_record.save
       else
         raise "Confirmation Failed: #{response.inspect}"
