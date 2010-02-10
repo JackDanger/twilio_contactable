@@ -50,9 +50,8 @@ that receives data from 4info.com
     end
 
 Now anything posted to the index (or create, if you've hooked this up RESTfully) action
-will automatically work. If 4info.com sends you a response from a user the user record
-will be found by their phone number and, if User has a 'receive_sms' method defined,
-the record will receive the message that's just been sent.
+will automatically work. If a user sends 4info.com a message their user record on your site
+will (if User has a 'receive_sms' method defined) receive the message directly.
 
 That's it. Patches welcome, forks celebrated.
 
