@@ -91,8 +91,8 @@ class FourInfoContactableTest < ActiveSupport::TestCase
         should_change "stored code" do
           @user.four_info_sms_confirmation_code
         end
-        should "set sms_confirmed? to true" do
-          assert @user.four_info_sms_confirmed?
+        should "not change sms_confirmed? to true" do
+          assert !@user.four_info_sms_confirmed?
         end
       end
       context "confirming phone number when the confirmation fails for some reason" do
