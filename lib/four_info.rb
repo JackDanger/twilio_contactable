@@ -1,7 +1,3 @@
-require File.join(File.dirname(__FILE__), 'contactable')
-require File.join(File.dirname(__FILE__), 'request')
-require File.join(File.dirname(__FILE__), 'response')
-
 module FourInfo
   Gateway = URI.parse 'http://gateway.4info.net/msg'
 
@@ -32,3 +28,7 @@ module FourInfo
     end
   end
 end
+
+require File.join(File.dirname(__FILE__), 'contactable')
+require File.join(File.dirname(__FILE__), 'request')
+require File.join(File.dirname(__FILE__), 'response')
