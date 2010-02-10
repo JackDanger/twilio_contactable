@@ -93,7 +93,10 @@ module FourInfo
 
   class Request
 
+    # Haml templates for XML
     @@templates = Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), 'templates', '*.haml')))
+
+    # YML config files
     @@test_mode_config_file = File.join(File.dirname(__FILE__), '..', 'test', 'sms.yml')
     @@likely_config_files = [
         File.join(File.dirname(__FILE__), '..', 'sms.yml'),
