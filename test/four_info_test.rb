@@ -18,16 +18,14 @@ class FourInfoTest < ActiveSupport::TestCase
     <message>Success</message>
   </status>
 </response>'
-  SendMsgError = '<?xml version="1.0" ?>
-<request clientId="123" clientKey="32IFJ23OFIJIWR" type="MESSAGE">
-  <message>
-    <recipient>
-      <type>5</type>
-      <id>+16505551212</id>
-    </recipient>
-    <text>Test message.</text>
-  </message>
-</request>'
+  SendMsgSuccess = '<?xml version="1.0" ?>
+<response>
+  <requestId>F81D4FAE-7DEC-11D0-A765-00A0C91E6BF6</requestId>
+  <status>
+    <id>1</id>
+    <message>Success</message>
+  </status>
+</response>'
 
   context "contactable class" do
     setup {
@@ -52,6 +50,13 @@ class FourInfoTest < ActiveSupport::TestCase
       setup { @user.sms_phone_number = nil}
       context "confirming phone number" do
         setup { @user.confirm_sms! }
+        should_not_change "any attributes" do
+          @user.attributes.inspect
+        end
+      end
+      context "sending message" do
+        setup { @worked = @user.send_sms!('message') }
+        should "not work" do assert !@worked end
         should_not_change "any attributes" do
           @user.attributes.inspect
         end
