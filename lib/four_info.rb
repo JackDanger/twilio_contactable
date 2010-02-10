@@ -42,8 +42,18 @@ module FourInfo
     end
 
     def send_sms!(msg, allow_multiple = false)
-      if msg.size > 160 && !allow_multiple
+      if msg.to_s.strip.blank?
+        raise "SMS Message is blank"
+      end
+      if msg.to_s.size > 160 && !allow_multiple
         raise "SMS Message is too long. Either specify that you want multiple messages or shorten the string."
+      end
+      unless four_info_sms_confirmed?
+        raise "Mobile number has not yet been confirmed, can't send message"
+      end
+
+      msg.to_s.scan(/.{1,160}/m).map do |text|
+        FourInfo::Request.new.deliver_message(text, four_info_sms_phone_number).success?
       end
     end
 
@@ -74,7 +84,6 @@ module FourInfo
   end
 
   Gateway = URI.parse 'http://gateway.4info.net:8080/msg'
-
 
   class Confirmation
     def initialize(number, contactable_record)
@@ -124,6 +133,13 @@ module FourInfo
       raise "Missing config File! Please add sms.yml to ./config or the 4info directory" unless config_file
 
       @config = YAML.load(File.read(config_file))['4info'].with_indifferent_access
+    end
+
+    def deliver_message(msg, number)
+      self.number = FourInfo.internationalize(number)
+
+      xml = template(:deliver).render(self)
+      Response.new(perform(xml))
     end
 
     def confirm(number)
