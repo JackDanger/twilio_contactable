@@ -42,6 +42,13 @@ module FourInfo
       Response.new(perform(xml))
     end
 
+    def unblock(number)
+      self.number = FourInfo.internationalize(number)
+
+      xml = template(:unblock).render(self)
+      Response.new(perform(xml))
+    end
+
     protected
 
       def template(name)
