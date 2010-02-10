@@ -109,7 +109,6 @@ class FourInfoTest < ActiveSupport::TestCase
       setup {
         FourInfo::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
         @user.confirm_sms!
-        p @user
       }
       context "sending a message" do
         setup {
