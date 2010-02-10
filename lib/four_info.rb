@@ -1,26 +1,4 @@
 module FourInfo
-  def self.mode;     @@mode ||= :live; end
-  def self.mode=(m); @@mode = m;      end
-
-  def self.numerize(numberish)
-    numberish.to_s.scan(/\d+/).join
-  end
-
-  def self.internationalize(given_number)
-    number = numerize(given_number)
-    case number.size
-    when 10
-      "+1#{number}"
-    when 11
-      "+#{number}"
-    when 12
-      number =~ /\+\d(11)/ ? number : nil
-    else
-      nil
-    end
-  end
-
-  Gateway = URI.parse 'http://gateway.4info.net:8080/msg'
 
   module Contactable
 
@@ -67,6 +45,30 @@ module FourInfo
       Confirmation.new(four_info_sms_phone_number, self).try
     end
   end
+
+  def self.mode;     @@mode ||= :live; end
+  def self.mode=(m); @@mode = m;      end
+
+  def self.numerize(numberish)
+    numberish.to_s.scan(/\d+/).join
+  end
+
+  def self.internationalize(given_number)
+    number = numerize(given_number)
+    case number.size
+    when 10
+      "+1#{number}"
+    when 11
+      "+#{number}"
+    when 12
+      number =~ /\+\d(11)/ ? number : nil
+    else
+      nil
+    end
+  end
+
+  Gateway = URI.parse 'http://gateway.4info.net:8080/msg'
+
 
   class Confirmation
     def initialize(number, contactable_record)
