@@ -45,7 +45,7 @@ class FourInfoTest < ActiveSupport::TestCase
   end
 
   context "contactable instance" do
-    setup { @user = User.first }
+    setup { @user = User.create! :sms_phone_number => '555-555-5555' }
 
     context "when phone number is blank" do
       setup { @user.sms_phone_number = nil}
@@ -56,7 +56,10 @@ class FourInfoTest < ActiveSupport::TestCase
         end
       end
       context "sending message" do
-        setup { @worked = @user.send_sms!('message') }
+        setup {
+          FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+          @worked = @user.send_sms!('message')
+        }
         should "not work" do assert !@worked end
         should_not_change "any attributes" do
           @user.attributes.inspect
@@ -99,7 +102,10 @@ class FourInfoTest < ActiveSupport::TestCase
 
     context "when the number is not confirmed" do
       context "sending a message" do
-        setup { @result = @user.send_sms!('message') }
+        setup {
+          FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+          @result = @user.send_sms!('message')
+        }
         should "send send no messages" do
           assert_equal false, @result
         end
@@ -111,11 +117,30 @@ class FourInfoTest < ActiveSupport::TestCase
         @user.update_attributes!(User.sms_confirmed_column => true)
       }
       context "sending a message" do
-        setup {
-          @result = @user.send_sms!('message')
-        }
+        setup { @result = @user.send_sms!('message') }
         should "send send exactly one message messages" do
           assert_equal [true], @result
+        end
+      end
+      context "sending a blank message" do
+        setup { @result = @user.send_sms!('') }
+        should "send send zero messages" do
+          assert_equal false, @result
+        end
+      end
+      context "sending a huge message" do
+        context "without the allow_multiple flag" do
+          should "raise an error" do
+            assert_raises ArgumentError do
+              @user.send_sms!("A"*200)
+            end
+          end
+        end
+        context "with the allow_multiple flag" do
+          setup { @result = @user.send_sms!("A"*200, true) }
+          should "send multiple messages" do
+            assert_equal [true, true], @result
+          end
         end
       end
     end

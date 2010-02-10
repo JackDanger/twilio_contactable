@@ -26,8 +26,6 @@ class User < ActiveRecord::Base
   include FourInfo::Contactable
 end
 
-User.create! :sms_phone_number => '555-555-5555'
-
 # kill all network access
 # module FourInfo
 #   class Request
