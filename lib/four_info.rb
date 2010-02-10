@@ -83,8 +83,10 @@ module FourInfo
         @contactable_record.four_info_sms_confirmation_code = response.confirmation_code
         @contactable_record.four_info_sms_confirmation_attempted = Time.now
         @contactable_record.save
+        true
       else
-        raise "Confirmation Failed: #{response.inspect}"
+        # "Confirmation Failed: #{response.inspect}"
+        false
       end
     end
   end
