@@ -1,4 +1,4 @@
-require 'test_helper'
+require File.join(File.dirname(__FILE__), 'test_helper')
 
 class FourInfoTest < ActiveSupport::TestCase
 
@@ -107,8 +107,8 @@ class FourInfoTest < ActiveSupport::TestCase
     end
     context "when the number is confirmed" do
       setup {
-        FourInfo::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
-        @user.confirm_sms!
+        FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+        @user.update_attributes!(User.sms_confirmed_column => true)
       }
       context "sending a message" do
         setup {

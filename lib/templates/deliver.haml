@@ -1,0 +1,7 @@
+!!! xml 1.0
+%request{ :clientId => config[:client_id], :clientKey => config[:client_key], :type => "MESSAGE" }
+  %message
+    %recipient
+      %type= 5
+      %id= number
+    %text= message

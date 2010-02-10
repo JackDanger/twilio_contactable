@@ -109,6 +109,7 @@ module FourInfo
 
     attr_accessor :config
     attr_accessor :number
+    attr_accessor :message
 
     def initialize
       config_file = :test == FourInfo.mode ?
@@ -120,8 +121,9 @@ module FourInfo
       @config = YAML.load(File.read(config_file))['4info'].with_indifferent_access
     end
 
-    def deliver_message(msg, number)
+    def deliver_message(message, number)
       self.number = FourInfo.internationalize(number)
+      self.message = message
 
       xml = template(:deliver).render(self)
       Response.new(perform(xml))
