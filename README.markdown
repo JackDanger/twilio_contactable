@@ -3,14 +3,12 @@
 
 Connect to the 4info SMS gateway
 
-If you're using 4info.com as your SMS gateway this gem will give you
-a painless API for both sending and receiving messages.
+If you're using 4info.com as your SMS gateway this gem will give you a painless API for both sending and receiving messages.
 
 Setting Up Your Model
 =====
 
-Include FourInfo::Contactable into your User class or whatever you're
-using to represent an entity with a phone number. 
+Include FourInfo::Contactable into your User class or whatever you're using to represent an entity with a phone number. 
 
     class User < ActiveRecord::Base
       include FourInfo::Contactable
@@ -39,20 +37,16 @@ You can manage the user's SMS state like so:
     @user = User.create(:sms_phone_number => '5552223333')
     @user.send_sms_confirmation!
 
-then ask the user for the confirmation code off their phone and
-pass it in to sms_confirm_with:
+then ask the user for the confirmation code off their phone and pass it in to sms_confirm_with:
 
     @user.sms_confirm_with(user_provided_code)
 
-If the code is right then the user's current phone number
-will be automatically marked as confirmed.
-you can check this at any time with:
+If the code is right then the user's current phone number will be automatically marked as confirmed. You can check this at any time with:
 
     @user.sms_confirmed? # => true
     @user.send_sms!("Hi! This is a text message.")
 
-Then maybe the user will reply with 'BLOCK' by accident
-and @user.sms_blocked? will be true.
+Then maybe the user will reply with 'BLOCK' by accident and @user.sms_blocked? will be true.
 You can fix this by calling:
 
     @user.unblock_sms!
@@ -61,11 +55,8 @@ You can fix this by calling:
 Receiving Messages From 4info.com
 ====
 
-You can also receive data posted to you from 4info.com. This is how
-you'll receive messages and notices that users have been blocked.
-All you need is to create a bare controller and include
-FourInfo::Controller into it. Then specify which Ruby class you're
-using as a contactable user model (likely User)
+You can also receive data posted to you from 4info.com. This is how you'll receive messages and notices that users have been blocked.
+All you need is to create a bare controller and include FourInfo::Controller into it. Then specify which Ruby class you're using as a contactable user model (likely User)
 
 
     class SMSController < ApplicationController
@@ -84,11 +75,9 @@ Now just tell 4info.com to POST messages and block notices to you at:
 
     http://myrubyapp.com/4info
 
-Now if your users reply to an SMS with 'STOP' your database will be updated
-to reflect this.
+Now if your users reply to an SMS with 'STOP' your database will be updated to reflect this.
 
-Incoming messages from a user will automatically be sent to that user's
-record:
+Incoming messages from a user will automatically be sent to that user's record:
 
    # If "I love you!" is sent to you from a user with the phone
    # number "555-111-9999" then the following will be executed:
