@@ -47,7 +47,7 @@ module FourInfo
       end
 
       def find_contactable(id)
-        [id, id.sub(/^\+/,''), id.sub(/^\+1/,'')].each do |possible_phone_number|
+        [id, id.sub(/^\+/,''), id.sub(/^\+1/,'')].uniq.compact.each do |possible_phone_number|
           found = @@contactable_class.find(
             :first,
             :conditions => 
