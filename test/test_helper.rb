@@ -30,11 +30,10 @@ class User < ActiveRecord::Base
 end
 
 # kill all network access
-# module FourInfo
-#   class Request
-#     def start
-#       Response.new(:success => true,
-#                    :confirmation_code => 'FAKE')
-#     end
-#   end
-# end
+module FourInfo
+  class Request
+    def start
+      raise "You forgot to stub out your net requests!"
+    end
+  end
+end
