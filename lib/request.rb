@@ -58,7 +58,6 @@ module FourInfo
       end
 
       def perform(body)
-        STDOUT.puts('in perform')
         start do |http|
           http.post(FourInfo::Gateway.path, body).read_body
         end
