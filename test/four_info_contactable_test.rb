@@ -95,7 +95,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
           @user.four_info_sms_confirmation_code
         end
         should "not have number confirmed yet" do
-          assert !@user.current_phone_number_confirmed_for_sms?
+          assert !@user.sms_confirmed?
         end
         context "calling sms_confirm_with(right_code)" do
           setup { @user.sms_confirm_with(@user.four_info_sms_confirmation_code) }
@@ -159,7 +159,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     context "when the number is confirmed" do
       setup {
         FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
-        @user.stubs(:current_phone_number_confirmed_for_sms?).returns(true)
+        @user.stubs(:sms_confirmed?).returns(true)
       }
       context "sending a message" do
         setup { @result = @user.send_sms!('message') }

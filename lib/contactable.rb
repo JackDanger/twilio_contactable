@@ -51,7 +51,7 @@ module FourInfo
         raise ArgumentError, "SMS Message is too long. Either specify that you want multiple messages or shorten the string."
       end
       return false if msg.to_s.strip.blank? || four_info_sms_blocked?
-      return false unless current_phone_number_confirmed_for_sms?
+      return false unless sms_confirmed?
 
       # split into pieces that fit as individual messages.
       msg.to_s.scan(/.{1,160}/m).map do |text|
@@ -64,7 +64,7 @@ module FourInfo
     # in the contactable record.
     def send_sms_confirmation!
       return false if four_info_sms_blocked?
-      return true  if current_phone_number_confirmed_for_sms?
+      return true  if sms_confirmed?
       return false if four_info_sms_phone_number.blank?
 
       response = FourInfo::Request.new.confirm(four_info_sms_phone_number)
@@ -106,7 +106,7 @@ module FourInfo
 
     # Returns true if the current phone number has been confirmed by
     # the user for recieving TXT messages.
-    def current_phone_number_confirmed_for_sms?
+    def sms_confirmed?
       return false if four_info_sms_confirmed_phone_number.blank?
       four_info_sms_confirmed_phone_number == four_info_sms_phone_number
     end
