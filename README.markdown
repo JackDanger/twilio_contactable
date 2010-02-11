@@ -90,4 +90,4 @@ record:
 
 That's it. Patches welcome, forks celebrated.
 
-Copyright (c) 2010 Jack Danger Canty (http://jåck.com/), released under the MIT license
+Copyright (c) 2010 [Jack Danger Canty](http://jåck.com/), released under the MIT license
