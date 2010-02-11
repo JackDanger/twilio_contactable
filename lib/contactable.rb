@@ -41,13 +41,6 @@ module FourInfo
       end
     end
 
-    # Returns true if the current phone number has been confirmed by
-    # the user for recieving TXT messages.
-    def current_phone_number_confirmed_for_sms?
-      return false if four_info_sms_confirmed_phone_number.blank?
-      four_info_sms_confirmed_phone_number == four_info_sms_phone_number
-    end
-
     # Sends one or more TXT messages to the contactable record's
     # mobile number (if the number has been confirmed).
     # Any messages longer than 160 characters will need to be accompanied
@@ -85,16 +78,6 @@ module FourInfo
       end
     end
 
-    # Compares user-provided code with the stored confirmation
-    # code. If they match then the current phone number is set
-    # as confirmed by the user.
-    def sms_confirm_with(code)
-      if four_info_sms_confirmation_code == code
-        # save the phone number into the 'confirmed phone number' attribute
-        self.four_info_sms_confirmed_phone_number = four_info_sms_phone_number
-      end
-    end
-
     # Sends an unblock request via xml to the 4info gateway.
     # If request succeeds, changes the contactable record's
     # sms_blocked_column to false.
@@ -108,6 +91,23 @@ module FourInfo
       else
         false
       end
+    end
+
+    # Compares user-provided code with the stored confirmation
+    # code. If they match then the current phone number is set
+    # as confirmed by the user.
+    def sms_confirm_with(code)
+      if four_info_sms_confirmation_code == code
+        # save the phone number into the 'confirmed phone number' attribute
+        self.four_info_sms_confirmed_phone_number = four_info_sms_phone_number
+      end
+    end
+
+    # Returns true if the current phone number has been confirmed by
+    # the user for recieving TXT messages.
+    def current_phone_number_confirmed_for_sms?
+      return false if four_info_sms_confirmed_phone_number.blank?
+      four_info_sms_confirmed_phone_number == four_info_sms_phone_number
     end
   end  
 end
