@@ -59,7 +59,11 @@ module FourInfo
 
       def perform(body)
         start do |http|
-          http.post(FourInfo::Gateway.path, body).read_body
+          http.post(
+            FourInfo::Gateway.path,
+            body,
+            {'Content-Type' => 'text/xml'}
+          ).read_body
         end
       end
 
