@@ -75,6 +75,11 @@ module FourInfo
       end
     end
 
+    def sms_confirmed!
+      # save the phone number into the 'confirmed phone number' attribute
+      four_info_sms_confirmed_phone_number four_info_sms_phone_number
+    end
+
     def unblock_sms!
       return false unless four_info_sms_blocked?
 
