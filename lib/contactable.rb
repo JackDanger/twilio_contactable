@@ -13,7 +13,7 @@ module FourInfo
       require 'net/http'
 
       Attributes.each do |attribute|
-        # add a method for setting or retrieving
+        # add a method in the class for setting or retrieving
         # which column should be used for which attribute
         # 
         # :sms_phone_number_column defaults to :sms_phone_number, etc.
@@ -24,8 +24,8 @@ module FourInfo
             @#{attribute}_column
           end
         "
-        # provide a helper method to access the right value
-        # no matter which column it's stored in
+        # provide helper methods to access the right value
+        # no matter which column it's stored in.
         #
         # e.g.: @user.four_info_sms_confirmation_code
         #       == @user.send(User.sms_confirmation_code_column)
