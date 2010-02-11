@@ -24,13 +24,15 @@ class FourInfoControllerTest < ActionController::TestCase
   context "with a user" do
     setup {
       User.delete_all
-      @user = User.create! :sms_phone_number => '3334445555'
+      @user = User.create! :sms_phone_number => '(206) 335-1596'
+      # and we should be able to find @user by this formatted version
+      @formatted_phone_number = "2063351596"
     }
     context "receiving BLOCK" do
       setup {
         post :index,
         # this is what an xml request will parse to:
-        "request"=>{"block"=>{"recipient"=>{"property"=>{"name"=>"CARRIER", "value"=>"3"}, "id"=>"+1#{@user.sms_phone_number}", "type"=>"5"}}, "type" => "BLOCK"}
+        "request"=>{"block"=>{"recipient"=>{"property"=>{"name"=>"CARRIER", "value"=>"3"}, "id"=>"+1#{@formatted_phone_number}", "type"=>"5"}}, "type" => "BLOCK"}
       }
       should_respond_with :success
       should "block user" do
@@ -43,7 +45,7 @@ class FourInfoControllerTest < ActionController::TestCase
     context "receiving MESSAGE" do
       setup {
         # this is what an xml request will parse to:
-        @receive_params = {"request"=>{"message"=>{"id" => "ABCDEFG", "recipient"=>{"type"=> "6", "id"=>"12345"}, "sender" => {"type" => "5", "id" => "+1#{@user.sms_phone_number}", "property" => {"name" => "CARRIER", "value" => "5"}}, "text" => "This is a text message."}, "type" => "MESSAGE"}}
+        @receive_params = {"request"=>{"message"=>{"id" => "ABCDEFG", "recipient"=>{"type"=> "6", "id"=>"12345"}, "sender" => {"type" => "5", "id" => "+1#{@formatted_phone_number}", "property" => {"name" => "CARRIER", "value" => "5"}}, "text" => "This is a text message."}, "type" => "MESSAGE"}}
       }
       context "when the user is not set up to receive" do
         setup {
