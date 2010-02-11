@@ -75,9 +75,11 @@ module FourInfo
       end
     end
 
-    def sms_confirmed!
-      # save the phone number into the 'confirmed phone number' attribute
-      self.four_info_sms_confirmed_phone_number = four_info_sms_phone_number
+    def sms_confirm_with(code)
+      if four_info_sms_confirmation_code == code
+        # save the phone number into the 'confirmed phone number' attribute
+        self.four_info_sms_confirmed_phone_number = four_info_sms_phone_number
+      end
     end
 
     def unblock_sms!
