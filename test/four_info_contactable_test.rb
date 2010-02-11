@@ -54,11 +54,11 @@ class FourInfoContactableTest < ActiveSupport::TestCase
   context "contactable instance" do
     setup {
       User.delete_all
-      @user = User.create! :sms_phone_number => '555-555-5555'
+      @user = User.create! User.sms_phone_number_column => '555-555-5555'
     }
 
     context "when phone number is blank" do
-      setup { @user.sms_phone_number = nil}
+      setup { @user.four_info_sms_phone_number = nil}
       context "confirming phone number" do
         setup { @user.send_sms_confirmation! }
         should_not_change "any attributes" do
@@ -78,7 +78,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     end
 
     context "when phone number exists" do
-      setup { @user.sms_phone_number = "206-555-5555"}
+      setup { @user.four_info_sms_phone_number = "206-555-5555"}
       context "confirming phone number" do
         setup {
           FourInfo::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
