@@ -86,13 +86,16 @@ class FourInfoContactableTest < ActiveSupport::TestCase
         }
         should "work" do assert @worked end
         should "save confirmation number in proper attribute" do
-          assert @user.four_info_sms_confirmation_code
+          assert_equal '123abc', @user.four_info_sms_confirmation_code
+        end
+        should "set confirmation attempted time" do
+          assert @user.four_info_sms_confirmation_attempted > 3.minutes.ago
         end
         should_change "stored code" do
           @user.four_info_sms_confirmation_code
         end
-        should "not change sms_confirmed? to true" do
-          assert !@user.four_info_sms_confirmed?
+        should "not have number confirmed yet" do
+          assert !@user.current_phone_number_confirmed_for_sms?
         end
       end
       context "confirming phone number when the confirmation fails for some reason" do
@@ -136,7 +139,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     context "when the number is confirmed" do
       setup {
         FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
-        @user.update_attributes!(User.sms_confirmed_column => true)
+        @user.stubs(:current_phone_number_confirmed_for_sms?).returns(true)
       }
       context "sending a message" do
         setup { @result = @user.send_sms!('message') }

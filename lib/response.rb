@@ -16,7 +16,7 @@ module FourInfo
     end
 
     def confirmation_code
-      self['confCode'].inner_text
+      self[:confcode].inner_text
     end
   end
 end
