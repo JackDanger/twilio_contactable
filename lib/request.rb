@@ -18,9 +18,9 @@ module FourInfo
     attr_accessor :message
 
     def initialize
-      config_file = :test == FourInfo.mode ?
-                      @@test_mode_config_file :
-                      @@likely_config_files.detect {|f| File.exist?(f) }
+      config_file = :live == FourInfo.mode.to_sym ?
+                      @@likely_config_files.detect {|f| File.exist?(f) } :
+                      @@test_mode_config_file
 
       raise "Missing config File! Please add sms.yml to ./config or the 4info directory" unless config_file
 
@@ -58,12 +58,16 @@ module FourInfo
       end
 
       def perform(body)
-        start do |http|
-          http.post(
-            FourInfo::Gateway.path,
-            body,
-            {'Content-Type' => 'text/xml'}
-          ).read_body
+        if :live == FourInfo.mode
+          start do |http|
+            http.post(
+              FourInfo::Gateway.path,
+              body,
+              {'Content-Type' => 'text/xml'}
+            ).read_body
+          end
+        else
+          FourInfo.log "Would have sent to 4info.net: #{body}"
         end
       end
 

@@ -3,10 +3,18 @@ module FourInfo
 
   class << self
     def mode
-      @@mode ||= :live
+      @@mode ||= :test
     end
     def mode=(new_mode)
       @@mode = new_mode
+    end
+
+    def log(msg)
+      if defined?(Rails)
+        Rails.logger.info msg
+      else
+        STDOUT.puts msg
+      end
     end
 
     def numerize(numberish)

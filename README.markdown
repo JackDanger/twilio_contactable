@@ -28,13 +28,22 @@ You can also specify which attributes you'd like to use instead of the defaults
       # Defaults to the name on the left (minus the '_column' at the end)
     end
 
+Turning the thing on
+---
+
+Because it can be expensive to send TXTs accidentally it's required that you manually configure FourInfo in your app. Put this line in config/initializers/sms.rb or config/environment.rb or anything that loads when the app starts:
+
+    FourInfo.mode = :live
+
+Skipping this step (or adding any other value) will prevent TXTs from actually being sent.
+
 Phone number formatting
 ---
 
 Whatever is stored in the sms_phone_number_column will be subject to normalized formatting:
 
-  user = User.create :sms_phone_number => '(206) 555-1234'
-  user.sms_phone_number # => 2065551234
+    user = User.create :sms_phone_number => '(206) 555-1234'
+    user.sms_phone_number # => 2065551234
 
 If you want to preserve the format of the number exactly as the user entered it you'll want
 to save it in a different attribute.
