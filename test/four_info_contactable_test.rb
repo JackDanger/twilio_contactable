@@ -102,6 +102,9 @@ class FourInfoContactableTest < ActiveSupport::TestCase
         end
         context "calling sms_confirm_with(right_code)" do
           setup { @user.sms_confirm_with(@user.four_info_sms_confirmation_code) }
+          should "work" do
+            assert @worked
+          end
           should "save the phone number into the confirmed attribute" do
             assert_equal @user.four_info_sms_confirmed_phone_number,
                          @user.four_info_sms_phone_number
@@ -111,7 +114,10 @@ class FourInfoContactableTest < ActiveSupport::TestCase
           end
         end
         context "calling sms_confirm_with(wrong_code)" do
-          setup { @user.sms_confirm_with('wrong_code') }
+          setup { @worked = @user.sms_confirm_with('wrong_code') }
+          should "not work" do
+            assert !@worked
+          end
           should "not save the phone number into the confirmed attribute" do
             assert_not_equal @user.four_info_sms_confirmed_phone_number,
                              @user.four_info_sms_phone_number
