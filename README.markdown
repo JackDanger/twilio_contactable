@@ -31,11 +31,11 @@ You can also specify which attributes you'd like to use instead of the defaults
 You can manage the user's SMS state like so:
 
     @user = User.create(:sms_phone_number => '5552223333')
-    @user.confirm_sms!
+    @user.send_sms_confirmation!
     # then ask the user for the confirmation code and
     # compare it to @user.sms_confirmation_code
     # if they're the same, call
-    @user.sms_confirmed!
+    @user.send_sms_confirmation!
     @user.update_attributes(:sms_confirmed_phone_number => @user.sms_phone_number)
     @user.send_sms!("Hi! This is a text message.")
     # Then maybe the user will reply with 'BLOCK' by accident

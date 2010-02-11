@@ -60,7 +60,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     context "when phone number is blank" do
       setup { @user.sms_phone_number = nil}
       context "confirming phone number" do
-        setup { @user.confirm_sms! }
+        setup { @user.send_sms_confirmation! }
         should_not_change "any attributes" do
           @user.attributes.inspect
         end
@@ -82,7 +82,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
       context "confirming phone number" do
         setup {
           FourInfo::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
-          @worked = @user.confirm_sms!
+          @worked = @user.send_sms_confirmation!
         }
         should "work" do assert @worked end
         should "save confirmation number in proper attribute" do
@@ -97,8 +97,8 @@ class FourInfoContactableTest < ActiveSupport::TestCase
         should "not have number confirmed yet" do
           assert !@user.current_phone_number_confirmed_for_sms?
         end
-        context "calling sms_confirmed!" do
-          setup { @user.sms_confirmed! }
+        context "calling send_sms_confirmation!" do
+          setup { @user.send_sms_confirmation! }
           should "save the phone number into the confirmed attribute" do
             assert_equal @user.four_info_sms_confirmed_phone_number,
                          @user.four_info_sms_phone_number
@@ -111,7 +111,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
       context "confirming phone number when the confirmation fails for some reason" do
         setup {
           FourInfo::Request.any_instance.stubs(:perform).returns(ValidationError)
-          @worked = @user.confirm_sms!
+          @worked = @user.send_sms_confirmation!
         }
         should "not work" do assert !@worked end
         should "not save confirmation number" do

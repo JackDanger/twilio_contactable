@@ -59,7 +59,7 @@ module FourInfo
       end
     end
 
-    def confirm_sms!
+    def send_sms_confirmation!
       return false if four_info_sms_blocked?
       return true  if current_phone_number_confirmed_for_sms?
       return false if four_info_sms_phone_number.blank?
