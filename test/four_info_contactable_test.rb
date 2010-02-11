@@ -97,13 +97,13 @@ class FourInfoContactableTest < ActiveSupport::TestCase
         should "not have number confirmed yet" do
           assert !@user.current_phone_number_confirmed_for_sms?
         end
-        context "calling send_sms_confirmation!" do
-          setup { @user.send_sms_confirmation! }
+        context "calling sms_confirmed!" do
+          setup { @user.sms_confirmed! }
           should "save the phone number into the confirmed attribute" do
             assert_equal @user.four_info_sms_confirmed_phone_number,
                          @user.four_info_sms_phone_number
           end
-          should_change "confirmed phone number attribuet" do
+          should_change "confirmed phone number attribute" do
             @user.four_info_sms_confirmed_phone_number
           end
         end

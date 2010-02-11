@@ -30,13 +30,13 @@ module FourInfo
         # e.g.: @user.four_info_sms_confirmation_code
         #       == @user.send(User.sms_confirmation_code_column)
         model.class_eval "
-          def four_info_#{attribute}(value = nil)
-            value ?
-              send(self.class.#{attribute}_column.to_s+'=', value) :
-              send(self.class.#{attribute}_column)
+          def four_info_#{attribute}
+            send self.class.#{attribute}_column
           end
           alias_method :four_info_#{attribute}?, :four_info_#{attribute}
-          alias_method :four_info_#{attribute}=, :four_info_#{attribute}
+          def four_info_#{attribute}=(value)
+            send self.class.#{attribute}_column.to_s+'=', value
+          end
         "
       end
     end
@@ -66,8 +66,8 @@ module FourInfo
 
       response = FourInfo::Request.new.confirm(four_info_sms_phone_number)
       if response.success?
-        self.four_info_sms_confirmation_code response.confirmation_code
-        self.four_info_sms_confirmation_attempted Time.now
+        self.four_info_sms_confirmation_code = response.confirmation_code
+        self.four_info_sms_confirmation_attempted = Time.now
         save
       else
         # "Confirmation Failed: #{response['message'].inspect}"
@@ -77,7 +77,7 @@ module FourInfo
 
     def sms_confirmed!
       # save the phone number into the 'confirmed phone number' attribute
-      four_info_sms_confirmed_phone_number four_info_sms_phone_number
+      self.four_info_sms_confirmed_phone_number = four_info_sms_phone_number
     end
 
     def unblock_sms!
@@ -85,7 +85,7 @@ module FourInfo
 
       response = FourInfo::Request.new.unblock(four_info_sms_phone_number)
       if response.success?
-        four_info_sms_blocked 'false'
+        self.four_info_sms_blocked = 'false'
         save!
       else
         false
