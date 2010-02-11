@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{4info}
-  s.version = "1.1.1"
+  s.version = "1.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jack Danger Canty"]
-  s.date = %q{2010-02-10}
+  s.date = %q{2010-02-11}
   s.description = %q{A complete Ruby API for handling SMS messages via 4info.com}
   s.email = %q{gitcommit@6brand.com}
   s.extra_rdoc_files = [
