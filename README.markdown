@@ -23,7 +23,7 @@ You can also specify which attributes you'd like to use instead of the defaults
       sms_blocked_column                 :is_sms_blocked
       sms_confirmation_code_column       :the_sms_confirmation_code
       sms_confirmation_attempted_column  :when_was_the_sms_confirmation_attempted
-      sms_confirmed_column               :is_the_mobile_number_confirmed
+      sms_confirmed_phone_number_column  :the_mobile_number_thats_been_confirmed
 
       # Defaults to the name on the left (minus the word '_column')
     end
@@ -34,7 +34,7 @@ You can manage the user's SMS state like so:
     @user.confirm_sms!
     # then ask the user for the confirmation code and
     # compare it to @user.sms_confirmation_code
-    @user.update_attributes(:sms_confirmed => true)
+    @user.update_attributes(:sms_confirmed_phone_number => @user.sms_phone_number)
     @user.send_sms!("Hi! This is a text message.")
     # Then maybe the user will reply with 'BLOCK' by accident
     @user.unblock_sms!

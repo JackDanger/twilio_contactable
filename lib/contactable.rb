@@ -5,7 +5,7 @@ module FourInfo
                     :sms_blocked,
                     :sms_confirmation_code,
                     :sms_confirmation_attempted,
-                    :sms_confirmed ]
+                    :sms_confirmed_phone_number ]
 
     def self.included(model)
       gem 'haml'
@@ -27,8 +27,8 @@ module FourInfo
         # provide a helper method to access the right value
         # no matter which column it's stored in
         #
-        # e.g.: @user.four_info_sms_confirmed
-        #       => @user.send(User.sms_confirmed_column)
+        # e.g.: @user.four_info_sms_confirmation_code
+        #       == @user.send(User.sms_confirmation_code_column)
         model.class_eval "
           def four_info_#{attribute}(value = nil)
             value ?
@@ -41,12 +41,18 @@ module FourInfo
       end
     end
 
+    def current_phone_number_confirmed_for_sms?
+      four_info_sms_confirmed_phone_number == four_info_sms_phone_number
+    end
+
     def send_sms!(msg, allow_multiple = false)
       if msg.to_s.size > 160 && !allow_multiple
         raise ArgumentError, "SMS Message is too long. Either specify that you want multiple messages or shorten the string."
       end
-      return false if msg.to_s.strip.blank? || four_info_sms_blocked? || !four_info_sms_confirmed?
+      return false if msg.to_s.strip.blank? || four_info_sms_blocked?
+      return false unless current_phone_number_confirmed_for_sms?
 
+      # split into pieces that fit as individual messages.
       msg.to_s.scan(/.{1,160}/m).map do |text|
         FourInfo::Request.new.deliver_message(text, four_info_sms_phone_number).success?
       end
@@ -54,7 +60,7 @@ module FourInfo
 
     def confirm_sms!
       return false if four_info_sms_blocked?
-      return true  if four_info_sms_confirmed?
+      return true  if current_phone_number_confirmed_for_sms?
       return false if four_info_sms_phone_number.blank?
 
       response = FourInfo::Request.new.confirm(four_info_sms_phone_number)
