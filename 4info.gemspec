@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{4info}
-  s.version = "1.0.3"
+  s.version = "1.0.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jack Danger Canty"]
@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "init.rb",
+     "lib/4info.rb",
      "lib/contactable.rb",
      "lib/controller.rb",
      "lib/four_info.rb",
