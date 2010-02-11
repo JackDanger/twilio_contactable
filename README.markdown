@@ -28,6 +28,17 @@ You can also specify which attributes you'd like to use instead of the defaults
       # Defaults to the name on the left (minus the '_column' at the end)
     end
 
+Phone number formatting
+---
+
+Whatever is stored in the sms_phone_number_column will be subject to normalized formatting:
+
+  user = User.create :sms_phone_number => '(206) 555-1234'
+  user.sms_phone_number # => 2065551234
+
+If you want to preserve the format of the number exactly as the user entered it you'll want
+to save it in a different attribute.
+
 
 Confirming Phone Number And Sending Messages
 ====

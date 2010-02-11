@@ -54,9 +54,12 @@ class FourInfoContactableTest < ActiveSupport::TestCase
   context "contactable instance" do
     setup {
       User.delete_all
-      @user = User.create! User.sms_phone_number_column => '555-555-5555'
+      @user = User.create! User.sms_phone_number_column => '(555) 123-4567'
     }
 
+    should "normalize phone number" do
+      assert_equal '5551234567', @user.four_info_sms_phone_number
+    end
     context "when phone number is blank" do
       setup { @user.four_info_sms_phone_number = nil}
       context "confirming phone number" do

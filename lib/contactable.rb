@@ -39,6 +39,18 @@ module FourInfo
           end
         "
       end
+
+      # normalize the phone number before it's saved in the database
+      # (only for model classes using callbacks a la ActiveRecord,
+      #  other folks will have to do this by hand)
+      if model.respond_to?(:before_save)
+        model.before_save :normalize_sms_phone_number
+        model.class_eval do
+          def normalize_sms_phone_number
+            self.four_info_sms_phone_number = FourInfo.numerize(four_info_sms_phone_number)
+          end
+        end
+      end
     end
 
     # Sends one or more TXT messages to the contactable record's
