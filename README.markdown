@@ -47,6 +47,7 @@ You can manage the user's SMS state like so:
 
     @user = User.create(:sms_phone_number => '5552223333')
     @user.send_sms_confirmation!
+    @user.sms_confirmed? # => false
 
 then ask the user for the confirmation code off their phone and pass it in to sms_confirm_with:
 
