@@ -38,17 +38,23 @@ You can manage the user's SMS state like so:
 
     @user = User.create(:sms_phone_number => '5552223333')
     @user.send_sms_confirmation!
-    # then ask the user for the confirmation code off their phone and
-    # pass it in to sms_confirm_with:
+
+then ask the user for the confirmation code off their phone and
+pass it in to sms_confirm_with:
+
     @user.sms_confirm_with(user_provided_code)
-    # If the code is right then the user's current phone number
-    # will be automatically marked as confirmed.
-    # you can check this at any time with:
+
+If the code is right then the user's current phone number
+will be automatically marked as confirmed.
+you can check this at any time with:
+
     @user.sms_confirmed? # => true
     @user.send_sms!("Hi! This is a text message.")
-    # Then maybe the user will reply with 'BLOCK' by accident
-    # and @user.sms_blocked? will be true.
-    # You can fix this by calling:
+
+Then maybe the user will reply with 'BLOCK' by accident
+and @user.sms_blocked? will be true.
+You can fix this by calling:
+
     @user.unblock_sms!
 
 
