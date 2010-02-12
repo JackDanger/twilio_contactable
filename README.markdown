@@ -31,7 +31,7 @@ You can also specify which attributes you'd like to use instead of the defaults
 Turning the thing on
 ---
 
-Because it can be expensive to send TXTs accidentally it's required that you manually configure FourInfo in your app. Put this line in config/initializers/sms.rb or config/environment.rb or anything that loads when the app starts:
+Because it can be expensive to send TXTs accidentally, it's required that you manually configure FourInfo in your app. Put this line in config/environments/production.rb or anything that loads _only_ in your production environment:
 
     FourInfo.mode = :live
 
