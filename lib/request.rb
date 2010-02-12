@@ -61,7 +61,7 @@ module FourInfo
         if :live == FourInfo.mode
           start do |http|
             http.post(
-              FourInfo::Gateway.path,
+              FourInfo.gateway.path,
               body,
               {'Content-Type' => 'text/xml'}
             ).read_body
@@ -75,7 +75,7 @@ module FourInfo
         net = config[:proxy].blank? ?
                 Net::HTTP :
                 Net::HTTP::Proxy(*config[:proxy].split(":"))
-        net.start(FourInfo::Gateway.host, FourInfo::Gateway.port) do |http|
+        net.start(FourInfo.gateway.host, FourInfo.gateway.port) do |http|
           yield http
         end
       end

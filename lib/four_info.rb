@@ -1,7 +1,10 @@
 module FourInfo
-  Gateway = URI.parse 'http://gateway.4info.net/msg'
-
   class << self
+    def gateway
+      require 'net/http'
+      URI.parse 'http://gateway.4info.net/msg'
+    end
+
     def mode
       @@mode ||= :test
     end
