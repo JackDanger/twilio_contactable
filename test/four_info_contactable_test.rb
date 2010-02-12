@@ -112,6 +112,19 @@ class FourInfoContactableTest < ActiveSupport::TestCase
           should_change "confirmed phone number attribute" do
             @user.four_info_sms_confirmed_phone_number
           end
+          context "and then attempting to confirm another number" do
+            setup {
+              @user.four_info_sms_phone_number = "206-555-5555"
+              FourInfo::Request.any_instance.expects(:perform).returns(ValidationSuccess).once
+              @user.send_sms_confirmation!
+            }
+            should "eliminate the previous confirmed phone number" do
+              assert @user.four_info_sms_confirmed_phone_number.blank?
+            end
+            should "un-confirm the record" do
+              assert !@user.sms_confirmed?
+            end
+          end
         end
         context "calling sms_confirm_with(wrong_code)" do
           setup { @worked = @user.sms_confirm_with('wrong_code') }
@@ -123,7 +136,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
                              @user.four_info_sms_phone_number
           end
           should_not_change "confirmed phone number attribute" do
-            @user.four_info_sms_confirmed_phone_number
+            @user.reload.four_info_sms_confirmed_phone_number
           end
         end
       end
