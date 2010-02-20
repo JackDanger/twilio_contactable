@@ -37,6 +37,22 @@ Because it can be expensive to send TXTs accidentally, it's required that you ma
 
 Skipping this step (or adding any other value) will prevent TXTs from actually being sent.
 
+You'll also want to configure your setup with your client_id and client_key. Put this in the same file as above or in a separate initializer if you wish:
+
+    FourInfo.configure do |config|
+      # these two are required:
+      # (replace them with your actual account info)
+      config.client_id = 12345
+      config.client_key = 'ABC123'
+
+      # the rest are optional:
+      config.short_code     = 00001 # if you have a custom short code
+      config.proxy_address  = 'my.proxy.com'
+      config.proxy_port     = '80'
+      config.proxy_username = 'user'
+      config.proxy_password = 'password'
+    end
+
 Phone number formatting
 ---
 
@@ -46,7 +62,7 @@ Whatever is stored in the sms_phone_number_column will be subject to normalized 
     user.sms_phone_number # => 2065551234
 
 If you want to preserve the format of the number exactly as the user entered it you'll want
-to save it in a different attribute.
+to save that in a different attribute.
 
 
 Confirming Phone Number And Sending Messages
