@@ -74,7 +74,10 @@ module FourInfo
     # Sends an SMS validation request via xml to the 4info gateway.
     # If request succeeds the 4info-generated confirmation code is saved
     # in the contactable record.
-    def send_sms_confirmation!
+    def send_sms_confirmation!(msg)
+      if msg.to_s.size > 160
+        raise ArgumentError, "SMS Confirmation Message is too long."
+      end
       return false if four_info_sms_blocked?
       return true  if sms_confirmed?
       return false if four_info_sms_phone_number.blank?
