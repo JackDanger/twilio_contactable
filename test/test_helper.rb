@@ -8,6 +8,7 @@ require 'active_support/test_case'
 require 'shoulda'
 require File.join(File.dirname(__FILE__), "..", 'lib', 'four_info')
 
+# default test configuration
 FourInfo.configure do |config|
   config.client_id  = '1'
   config.client_key = 'ABCDEF'

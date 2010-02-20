@@ -140,6 +140,36 @@ class FourInfoContactableTest < ActiveSupport::TestCase
           end
         end
       end
+      context "confirming phone number with a custom short code" do
+        context "with expectations" do
+          setup {
+            FourInfo.configure do |config|
+              config.short_code = '0005'
+              config.client_id  = 1
+              config.client_key = 'ABC123'
+            end
+            message = "long message blah blah MYCODE blah"
+            FourInfo.expects(:generate_confirmation_code).returns('MYCODE').once
+            FourInfo.expects(:confirmation_message).returns(message).once
+            FourInfo::Request.any_instance.expects(:deliver_message).with(message, @user.four_info_sms_phone_number).once
+            @user.send_sms_confirmation!
+          }
+        end
+        context "(normal)" do
+          setup {
+            FourInfo.configure do |config|
+              config.short_code = '0005'
+              config.client_id  = 1
+              config.client_key = 'ABC123'
+            end
+            FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+            @worked = @user.send_sms_confirmation!
+          }
+          should "work" do
+            assert @worked
+          end
+        end
+      end
       context "confirming phone number when the confirmation fails for some reason" do
         setup {
           FourInfo::Request.any_instance.stubs(:perform).returns(ValidationError)

@@ -20,9 +20,8 @@ module FourInfo
       Response.new(perform(xml))
     end
 
-    def confirm(message, number)
+    def confirm(number)
       self.number  = FourInfo.internationalize(number)
-      self.message = message
 
       xml = template(:confirm).render(self)
       Response.new(perform(xml))
