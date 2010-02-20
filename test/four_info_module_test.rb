@@ -43,4 +43,14 @@ class FourInfoModuleTest < ActiveSupport::TestCase
       assert_equal 6, @code.length
     end
   end
+
+  context "confirmation message" do
+    setup {
+      @code = 'ABC123'
+      @message = FourInfo.confirmation_message(@code)
+    }
+    should "include code" do
+      assert @message.include?(@code)
+    end
+  end
 end
