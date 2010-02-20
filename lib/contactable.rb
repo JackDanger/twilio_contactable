@@ -79,33 +79,13 @@ module FourInfo
       return true  if sms_confirmed?
       return false if four_info_sms_phone_number.blank?
 
-      # TODO: separate the following lines into one
-      # method for the default short code and another
-      # for custom short codes
-      confirmation_code = FourInfo.generate_confirmation_code
-
-      # Use this class' confirmation_message method if it
-      # exists, otherwise use the generic kind
-      message = (self.class.respond_to?(:confirmation_message) ?
-                   self.class :
-                   FourInfo).confirmation_message(confirmation_code)
-
-      if message.to_s.size > 160
-        raise ArgumentError, "SMS Confirmation Message is too long."
-      end
-
-      response = FourInfo::Request.new.confirm(message, four_info_sms_phone_number)
-      if response.success?
-        self.four_info_sms_confirmation_code = confirmation_code
-#        self.four_info_sms_confirmation_code = response.confirmation_code
-        self.four_info_sms_confirmation_attempted = Time.now.utc
-        self.four_info_sms_confirmed_phone_number = nil
-        save
-      else
-        # "Confirmation Failed: #{response['message'].inspect}"
-        false
-      end
+      # If we're using a custom short code we'll
+      # need to create a custom configuration message
+      FourInfo.configuration.short_code ?
+        confirm_four_info_sms_with_custom_message :
+        confirm_four_info_sms_with_default_message
     end
+
 
     # Sends an unblock request via xml to the 4info gateway.
     # If request succeeds, changes the contactable record's
@@ -141,5 +121,47 @@ module FourInfo
       return false if four_info_sms_confirmed_phone_number.blank?
       four_info_sms_confirmed_phone_number == four_info_sms_phone_number
     end
+
+    protected
+      def confirm_four_info_sms_with_custom_message
+        confirmation_code = FourInfo.generate_confirmation_code
+
+        # Use this class' confirmation_message method if it
+        # exists, otherwise use the generic message
+        message = (self.class.respond_to?(:confirmation_message) ?
+                     self.class :
+                     FourInfo).confirmation_message(confirmation_code)
+
+        if message.to_s.size > 160
+          raise ArgumentError, "SMS Confirmation Message is too long."
+        end
+
+        response = FourInfo::Request.new.deliver_message(message, four_info_sms_phone_number)
+
+        if response.success?
+          update_four_info_sms_confirmation confirmation_code
+        else
+          # "Confirmation Failed: #{response['message'].inspect}"
+          false
+        end
+      end
+
+      def confirm_four_info_sms_with_default_message
+        response = FourInfo::Request.new.confirm(four_info_sms_phone_number)
+
+        if response.success?
+          update_four_info_sms_confirmation response.confirmation_code
+        else
+          # "Confirmation Failed: #{response['message'].inspect}"
+          false
+        end
+      end
+
+      def update_four_info_sms_confirmation(new_code)
+        self.four_info_sms_confirmation_code = new_code
+        self.four_info_sms_confirmation_attempted = Time.now.utc
+        self.four_info_sms_confirmed_phone_number = nil
+        save
+      end
   end  
 end

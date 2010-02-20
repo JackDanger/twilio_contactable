@@ -30,6 +30,10 @@ module FourInfo
         nil
       end
     end
+
+    def confirmation_message(confirmation_code)
+      "4INFO alert confirm. code: #{confirmation_code} Enter code on web to verify phone. Msg&data rates may apply. Freq set by u. T&C & support at www.4info.com. Txt HELP for help"
+    end
   end
 end
 
