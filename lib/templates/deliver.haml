@@ -1,6 +1,10 @@
 !!! XML
 %request{ :clientId => config.client_id, :clientKey => config.client_key, :type => "MESSAGE" }
   %message
+    - if config.short_code
+      %sender
+        %type= 6
+        %id= config.short_code
     %recipient
       %type= 5
       %id= number
