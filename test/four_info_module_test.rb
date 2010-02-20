@@ -36,4 +36,11 @@ class FourInfoModuleTest < ActiveSupport::TestCase
       end
     end
   end
+
+  context "generating codes" do
+    setup { @code = FourInfo.generate_confirmation_code }
+    should "be 6 digits" do
+      assert_equal 6, @code.length
+    end
+  end
 end

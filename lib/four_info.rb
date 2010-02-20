@@ -34,6 +34,11 @@ module FourInfo
     def confirmation_message(confirmation_code)
       "4INFO alert confirm. code: #{confirmation_code} Enter code on web to verify phone. Msg&data rates may apply. Freq set by u. T&C & support at www.4info.com. Txt HELP for help"
     end
+
+    def generate_confirmation_code
+      chars = (0..9).to_a + ('A'..'Z').to_a
+      (0...6).collect { chars[Kernel.rand(chars.length)] }.join
+    end
   end
 end
 
