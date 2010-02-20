@@ -1,16 +1,25 @@
 module FourInfo
+  class << self
+    def mode
+      @@mode ||= :test
+    end
 
-  def configured?
-    return false unless configuration
-    configuration.client_id && configuration.client_key
-  end
+    def mode=(new_mode)
+      @@mode = new_mode
+    end
 
-  def self.configuration
-    @@configuration
-  end
+    def configured?
+      return false unless configuration
+      configuration.client_id && configuration.client_key
+    end
 
-  def self.configure(&block)
-    @@configuration = Configuration.new(&block)
+    def configuration
+      @@configuration
+    end
+
+    def configure(&block)
+      @@configuration = Configuration.new(&block)
+    end
   end
 
   class Configuration

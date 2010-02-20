@@ -1,5 +1,5 @@
 !!! XML
-%request{ :clientId => config[:client_id], :clientKey => config[:client_key], :type => "UNBLOCK" }
+%request{ :clientId => config.client_id, :clientKey => config.client_key, :type => "UNBLOCK" }
   %unblock
     %recipient
       %type= 5

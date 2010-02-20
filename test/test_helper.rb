@@ -8,6 +8,11 @@ require 'active_support/test_case'
 require 'shoulda'
 require File.join(File.dirname(__FILE__), "..", 'lib', 'four_info')
 
+FourInfo.configure do |config|
+  config.client_id  = '1'
+  config.client_key = 'ABCDEF'
+end
+
 FourInfo.mode = :test
 config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
 ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")

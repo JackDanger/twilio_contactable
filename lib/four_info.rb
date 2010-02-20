@@ -5,13 +5,6 @@ module FourInfo
       URI.parse 'http://gateway.4info.net/msg'
     end
 
-    def mode
-      @@mode ||= :test
-    end
-    def mode=(new_mode)
-      @@mode = new_mode
-    end
-
     def log(msg)
       if defined?(Rails)
         Rails.logger.info msg

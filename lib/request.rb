@@ -9,6 +9,7 @@ module FourInfo
       unless FourInfo.configured?
         raise "You need to configure FourInfo before using it!"
       end
+      self.config = FourInfo.configuration
     end
 
     def deliver_message(message, number)
@@ -59,9 +60,13 @@ module FourInfo
       end
 
       def start
-        net = config[:proxy].blank? ?
-                Net::HTTP :
-                Net::HTTP::Proxy(*config[:proxy].split(":"))
+        net = config.proxy_address ?
+                Net::HTTP::Proxy(
+                  config.proxy_address,
+                  config.proxy_port,
+                  config.proxy_username,
+                  config.proxy_password) :
+                Net::HTTP
         net.start(FourInfo.gateway.host, FourInfo.gateway.port) do |http|
           yield http
         end
