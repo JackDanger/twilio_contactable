@@ -137,7 +137,6 @@ module FourInfo
         if response.success?
           update_four_info_sms_confirmation confirmation_code
         else
-          # "Confirmation Failed: #{response['message'].inspect}"
           false
         end
       end
@@ -148,7 +147,6 @@ module FourInfo
         if response.success?
           update_four_info_sms_confirmation response.confirmation_code
         else
-          # "Confirmation Failed: #{response['message'].inspect}"
           false
         end
       end
