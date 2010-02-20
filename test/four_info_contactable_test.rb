@@ -34,6 +34,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
   </status>
 </response>'
 
+
   context "contactable class" do
     setup {
       @klass = Class.new
@@ -63,7 +64,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     context "when phone number is blank" do
       setup { @user.four_info_sms_phone_number = nil}
       context "confirming phone number" do
-        setup { @user.send_sms_confirmation! }
+        setup { @user.send_sms_confirmation!(OurConfirmationMessage) }
         should_not_change "any attributes" do
           @user.attributes.inspect
         end
@@ -85,7 +86,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
       context "confirming phone number" do
         setup {
           FourInfo::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
-          @worked = @user.send_sms_confirmation!
+          @worked = @user.send_sms_confirmation!(OurConfirmationMessage)
         }
         should "work" do assert @worked end
         should "save confirmation number in proper attribute" do

@@ -74,17 +74,30 @@ module FourInfo
     # Sends an SMS validation request via xml to the 4info gateway.
     # If request succeeds the 4info-generated confirmation code is saved
     # in the contactable record.
-    def send_sms_confirmation!(msg)
-      if msg.to_s.size > 160
-        raise ArgumentError, "SMS Confirmation Message is too long."
-      end
+    def send_sms_confirmation!
       return false if four_info_sms_blocked?
       return true  if sms_confirmed?
       return false if four_info_sms_phone_number.blank?
 
-      response = FourInfo::Request.new.confirm(four_info_sms_phone_number)
+      # TODO: separate the following lines into one
+      # method for the default short code and another
+      # for custom short codes
+      confirmation_code = FourInfo.generate_confirmation_code
+
+      # Use this class' confirmation_message method if it
+      # exists, otherwise use the generic kind
+      message = (self.class.respond_to?(:confirmation_message) ?
+                   self.class :
+                   FourInfo).confirmation_message(confirmation_code)
+
+      if message.to_s.size > 160
+        raise ArgumentError, "SMS Confirmation Message is too long."
+      end
+
+      response = FourInfo::Request.new.confirm(message, four_info_sms_phone_number)
       if response.success?
-        self.four_info_sms_confirmation_code = response.confirmation_code
+        self.four_info_sms_confirmation_code = confirmation_code
+#        self.four_info_sms_confirmation_code = response.confirmation_code
         self.four_info_sms_confirmation_attempted = Time.now.utc
         self.four_info_sms_confirmed_phone_number = nil
         save
