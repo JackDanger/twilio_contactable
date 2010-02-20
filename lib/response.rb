@@ -3,7 +3,12 @@ module FourInfo
     def initialize(xml)
       gem 'hpricot'
       require 'hpricot'
+      @xml  = xml
       @body = Hpricot.parse(xml)
+    end
+
+    def inspect
+      @xml.to_s
     end
 
     def [](name)
