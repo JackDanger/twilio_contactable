@@ -38,6 +38,7 @@ module FourInfo
 
       def template(name)
         # Haml templates for XML
+        require 'cgi'
         templates = Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), 'templates', '*.haml')))
         file = templates.detect {|t| File.basename(t).chomp('.haml').to_sym == name.to_sym }
         raise ArgumentError, "Missing 4Info template: #{name}" unless file

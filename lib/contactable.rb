@@ -132,6 +132,10 @@ module FourInfo
                      self.class :
                      FourInfo).confirmation_message(confirmation_code)
 
+        if message.to_s.size > 160
+          raise ArgumentError, "SMS Confirmation Message is too long. Limit it to 160 characters of unescaped text."
+        end
+
         response = FourInfo::Request.new.deliver_message(message, four_info_sms_phone_number)
 
         if response.success?
