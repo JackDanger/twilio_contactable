@@ -106,7 +106,7 @@ module FourInfo
     # code. If they match then the current phone number is set
     # as confirmed by the user.
     def sms_confirm_with(code)
-      if four_info_sms_confirmation_code == code
+      if four_info_sms_confirmation_code.downcase == code.downcase
         # save the phone number into the 'confirmed phone number' attribute
         self.four_info_sms_confirmed_phone_number = four_info_sms_phone_number
         save

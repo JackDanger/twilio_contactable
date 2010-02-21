@@ -12,7 +12,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
   ValidationSuccess = '<?xml version=”1.0” ?>
 <response>
   <requestId>F81D4FAE-7DEC-11D0-A765-00A0C91E6BF6</requestId>
-  <confCode>123abc</confCode>
+  <confCode>123ABC</confCode>
   <status>
     <id>1</id>
     <message>Success</message>
@@ -89,7 +89,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
         }
         should "work" do assert @worked end
         should "save confirmation number in proper attribute" do
-          assert_equal '123abc', @user.four_info_sms_confirmation_code
+          assert_equal '123ABC', @user.four_info_sms_confirmation_code
         end
         should "set confirmation attempted time" do
           assert @user.four_info_sms_confirmation_attempted > 3.minutes.ago
@@ -124,6 +124,23 @@ class FourInfoContactableTest < ActiveSupport::TestCase
             should "un-confirm the record" do
               assert !@user.sms_confirmed?
             end
+          end
+        end
+        context "calling sms_confirm_with(right code, wrong case)" do
+          setup {
+            @downcased_code = @user.four_info_sms_confirmation_code.downcase
+            @worked = @user.sms_confirm_with(@downcased_code)
+          }
+          should "have good test data" do
+            assert_not_equal @downcased_code,
+                             @user.four_info_sms_confirmation_code
+          end
+          should "work" do
+            assert @worked
+          end
+          should "save the phone number into the confirmed attribute" do
+            assert_equal @user.four_info_sms_confirmed_phone_number,
+                         @user.four_info_sms_phone_number
           end
         end
         context "calling sms_confirm_with(wrong_code)" do
