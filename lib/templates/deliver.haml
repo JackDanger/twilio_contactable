@@ -8,4 +8,4 @@
     %recipient
       %type= 5
       %id= number
-    %text= CGI.escape message
+    %text= message.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;").gsub("'", "&apos;").gsub('"', "&quot;")
