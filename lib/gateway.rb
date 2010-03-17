@@ -9,6 +9,21 @@ module Txter
       Response.new(:status => :success)
     end
 
+    def self.current
+      case Txter.configuration.gateway
+      when 'twilio'
+        gem 'twiliolib'
+        require 'twiliolib'
+        GatewayTwilio
+      when '4info'
+        Gateway4info
+      when 'test'
+        Txter::Gateway
+      else
+        raise "You need to specify your Txter gateway!"
+      end
+    end
+
     class Request
     end
 
@@ -19,19 +34,6 @@ module Txter
 
       def success?
         :success == @options[:status]
-      end
-    end
-
-    def self.current
-      case Txter.configuration.gateway
-      when 'twilio'
-        GatewayTwilio
-      when '4info'
-        Gateway4info
-      when 'test'
-        Txter::Gateway
-      else
-        raise "You need to specify your Txter gateway!"
       end
     end
   end
