@@ -4,51 +4,55 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{4info}
-  s.version = "1.3.4"
+  s.name = %q{txter}
+  s.version = "2.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jack Danger Canty"]
-  s.date = %q{2010-03-09}
-  s.description = %q{A complete Ruby API for handling SMS messages via 4info.com}
+  s.date = %q{2010-03-17}
+  s.description = %q{Drop-in functionality to let Ruby apps send and receive TXT messages}
   s.email = %q{gitcommit@6brand.com}
   s.extra_rdoc_files = [
     "README.markdown"
   ]
   s.files = [
-    "4info.gemspec",
-     "MIT-LICENSE",
+    "MIT-LICENSE",
      "README.markdown",
      "Rakefile",
      "VERSION",
      "init.rb",
-     "lib/4info.rb",
+     "lib/4info_templates/confirm.haml",
+     "lib/4info_templates/deliver.haml",
+     "lib/4info_templates/unblock.haml",
      "lib/configuration.rb",
      "lib/contactable.rb",
      "lib/controller.rb",
+     "lib/gateway.rb",
+     "lib/gateway_4info.rb",
+     "lib/gateway_twilio.rb",
      "lib/txter.rb",
-     "lib/request.rb",
-     "lib/response.rb",
-     "lib/templates/confirm.haml",
-     "lib/templates/deliver.haml",
-     "lib/templates/unblock.haml",
      "test/.gitignore",
      "test/database.yml",
+     "test/gateway_4info_test.rb",
+     "test/gateway_twilio_test.rb",
+     "test/test_helper.rb",
      "test/txter_contactable_test.rb",
      "test/txter_controller_test.rb",
      "test/txter_module_test.rb",
-     "test/test_helper.rb"
+     "txter.gemspec"
   ]
-  s.homepage = %q{http://github.com/JackDanger/4info}
+  s.homepage = %q{http://github.com/JackDanger/txter}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.5}
-  s.summary = %q{Send and receive SMS messages via 4info.com}
+  s.summary = %q{Send and receive SMS messages simply via the Twilio gateway or the 4info.com gateway}
   s.test_files = [
-    "test/txter_contactable_test.rb",
+    "test/gateway_4info_test.rb",
+     "test/gateway_twilio_test.rb",
+     "test/test_helper.rb",
+     "test/txter_contactable_test.rb",
      "test/txter_controller_test.rb",
-     "test/txter_module_test.rb",
-     "test/test_helper.rb"
+     "test/txter_module_test.rb"
   ]
 
   if s.respond_to? :specification_version then
@@ -56,19 +60,13 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<hpricot>, [">= 0"])
-      s.add_runtime_dependency(%q<haml>, [">= 0"])
       s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<mocha>, [">= 0"])
     else
-      s.add_dependency(%q<hpricot>, [">= 0"])
-      s.add_dependency(%q<haml>, [">= 0"])
       s.add_dependency(%q<shoulda>, [">= 0"])
       s.add_dependency(%q<mocha>, [">= 0"])
     end
   else
-    s.add_dependency(%q<hpricot>, [">= 0"])
-    s.add_dependency(%q<haml>, [">= 0"])
     s.add_dependency(%q<shoulda>, [">= 0"])
     s.add_dependency(%q<mocha>, [">= 0"])
   end
