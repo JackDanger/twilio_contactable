@@ -2,8 +2,40 @@ module Txter
   class Gateway4info < Txter::Gateway
 
     def self.deliver(message, number)
-      Request.new.deliver_message(message, number)
+      Gateway4info.perform Request.new.deliver_message(message, number)
     end
+
+    def self.perform(body)
+      if :live == Txter.mode
+        require 'net/http'
+        uri = URI.parse 'http://gateway.4info.net/msg'
+        body = start do |http|
+          http.post(
+                     uri.path,
+                     body,
+                     {'Content-Type' => 'text/xml'}
+          ).read_body
+        end
+        Response.new(body)
+      else
+        Txter.log "Would have sent to 4info.net: #{body}"
+      end
+    end
+      
+    protected
+
+      def self.start
+        net = config.proxy_address ?
+                Net::HTTP::Proxy(
+                  config.proxy_address,
+                  config.proxy_port,
+                  config.proxy_username,
+                  config.proxy_password) :
+                Net::HTTP
+        net.start(Txter.gateway.host, Txter.gateway.port) do |http|
+          yield http
+        end
+      end
 
     class Response < Txter::Gateway::Response
       def initialize(xml)
@@ -35,6 +67,7 @@ module Txter
 
       attr_accessor :number
       attr_accessor :message
+      attr_accessor :config
 
       def initialize
         unless Txter.configured?
@@ -47,22 +80,19 @@ module Txter
         self.number  = Txter.internationalize(number)
         self.message = message
 
-        xml = template(:deliver).render(self)
-        Response.new(perform(xml))
+        template(:deliver).render(self)
       end
 
       def confirm(number)
         self.number  = Txter.internationalize(number)
 
-        xml = template(:confirm).render(self)
-        Response.new(perform(xml))
+        template(:confirm).render(self)
       end
 
       def unblock(number)
         self.number = Txter.internationalize(number)
 
-        xml = template(:unblock).render(self)
-        Response.new(perform(xml))
+        template(:unblock).render(self)
       end
 
       protected
@@ -70,42 +100,11 @@ module Txter
         def template(name)
           # Haml templates for XML
           require 'cgi'
-          templates = Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), 'templates', '*.haml')))
+          templates = Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), '4info_templates', '*.haml')))
           file = templates.detect {|t| File.basename(t).chomp('.haml').to_sym == name.to_sym }
           raise ArgumentError, "Missing 4Info template: #{name}" unless file
           Haml::Engine.new(File.read(file))
         end
     end
-
-    protected
-
-      def perform(body)
-        if :live == Txter.mode
-          require 'net/http'
-          uri = URI.parse 'http://gateway.4info.net/msg'
-          start do |http|
-            http.post(
-                       uri.path,
-                       body,
-                       {'Content-Type' => 'text/xml'}
-            ).read_body
-          end
-        else
-          Txter.log "Would have sent to 4info.net: #{body}"
-        end
-      end
-      
-      def start
-        net = config.proxy_address ?
-                Net::HTTP::Proxy(
-                  config.proxy_address,
-                  config.proxy_port,
-                  config.proxy_username,
-                  config.proxy_password) :
-                Net::HTTP
-        net.start(Txter.gateway.host, Txter.gateway.port) do |http|
-          yield http
-        end
-      end
   end
 end

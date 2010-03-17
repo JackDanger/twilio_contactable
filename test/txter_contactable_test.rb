@@ -9,6 +9,11 @@ class TxterContactableTest < ActiveSupport::TestCase
     setup {
       @klass = Class.new
       @klass.send :include, Txter::Contactable
+      Txter.configure do |config|
+        config.client_id  = 12345
+        config.client_key = 'ABC123'
+        config.gateway    = 'test'
+      end
     }
     Txter::Contactable::Attributes.each do |attribute|
       should "begin with appropriate default for #{attribute}_column" do
