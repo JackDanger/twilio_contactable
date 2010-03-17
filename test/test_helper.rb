@@ -12,6 +12,7 @@ require File.join(File.dirname(__FILE__), "..", 'lib', 'txter')
 Txter.configure do |config|
   config.client_id  = '1'
   config.client_key = 'ABCDEF'
+  config.gateway    = 'test'
 end
 
 Txter.mode = :test

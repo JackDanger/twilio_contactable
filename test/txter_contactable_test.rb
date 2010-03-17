@@ -2,37 +2,8 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 class TxterContactableTest < ActiveSupport::TestCase
 
-  ValidationError = '<?xml version="1.0" encoding="UTF-8"?>
-<response>
-  <status>
-    <id>4</id>
-    <message>Validation Error</message>
-  </status>
-</response>'
-  ValidationSuccess = '<?xml version=”1.0” ?>
-<response>
-  <requestId>F81D4FAE-7DEC-11D0-A765-00A0C91E6BF6</requestId>
-  <confCode>123ABC</confCode>
-  <status>
-    <id>1</id>
-    <message>Success</message>
-  </status>
-</response>'
-  SendMsgSuccess = '<?xml version="1.0" ?>
-<response>
-  <requestId>F81D4FAE-7DEC-11D0-A765-00A0C91E6BF6</requestId>
-  <status>
-    <id>1</id>
-    <message>Success</message>
-  </status>
-</response>'
-  UnblockSuccess = '<?xml version=”1.0” ?>
-<response>
-  <status>
-    <id>1</id>
-    <message>Success</message>
-  </status>
-</response>'
+  Success = Txter::Gateway::Response.new(:status => :success)
+  Error   = Txter::Gateway::Response.new(:status => :error)
 
   context "contactable class" do
     setup {
@@ -70,7 +41,7 @@ class TxterContactableTest < ActiveSupport::TestCase
       end
       context "sending message" do
         setup {
-          Txter::Request.any_instance.stubs(:perform).returns(Success)
+          Txter.gateway.stubs(:perform).returns(Success)
           @worked = @user.send_sms!('message')
         }
         should "not work" do assert !@worked end
@@ -115,7 +86,7 @@ class TxterContactableTest < ActiveSupport::TestCase
           context "and then attempting to confirm another number" do
             setup {
               @user.txter_sms_phone_number = "206-555-5555"
-              Txter::Request.any_instance.expects(:perform).returns(Success).once
+              Txter.stubs(:deliver).returns(Success).once
               @user.send_sms_confirmation!
             }
             should "eliminate the previous confirmed phone number" do
@@ -162,6 +133,7 @@ class TxterContactableTest < ActiveSupport::TestCase
           setup {
             Txter.configure do |config|
               config.short_code = '0005'
+              config.gateway    = 'test'
               config.client_id  = 1
               config.client_key = 'ABC123'
             end
@@ -176,6 +148,7 @@ class TxterContactableTest < ActiveSupport::TestCase
           setup {
             Txter.configure do |config|
               config.short_code = '0005'
+              config.gateway    = 'test'
               config.client_id  = 1
               config.client_key = 'ABC123'
             end
@@ -189,7 +162,7 @@ class TxterContactableTest < ActiveSupport::TestCase
       end
       context "confirming phone number when the confirmation fails for some reason" do
         setup {
-          Txter::Request.any_instance.stubs(:perform).returns(Error)
+          Txter.stubs(:deliver).returns(Error)
           @worked = @user.send_sms_confirmation!
         }
         should "not work" do assert !@worked end
@@ -227,13 +200,13 @@ class TxterContactableTest < ActiveSupport::TestCase
     end
     context "when the number is confirmed" do
       setup {
-        Txter::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+        Txter::Request.any_instance.stubs(:perform).returns(Success)
         @user.stubs(:sms_confirmed?).returns(true)
       }
       context "sending a message" do
         setup { @result = @user.send_sms!('message') }
-        should "send send exactly one message messages" do
-          assert_equal [true], @result
+        should "send send exactly one message" do
+          assert_equal [7], @result
         end
       end
       context "sending a blank message" do
@@ -253,7 +226,7 @@ class TxterContactableTest < ActiveSupport::TestCase
         context "with the allow_multiple flag" do
           setup { @result = @user.send_sms!("A"*200, true) }
           should "send multiple messages" do
-            assert_equal [true, true], @result
+            assert_equal [160, 40], @result
           end
         end
       end
@@ -275,7 +248,7 @@ class TxterContactableTest < ActiveSupport::TestCase
     end
     context "when the number is blocked" do
       setup {
-        Txter::Request.any_instance.stubs(:perform).returns(UnblockSuccess)
+        Txter::Request.any_instance.stubs(:perform).returns(Success)
         @user.update_attributes!(:sms_blocked => true)
       }
       context "unblocking" do

@@ -67,7 +67,11 @@ module Txter
 
       # split into pieces that fit as individual messages.
       msg.to_s.scan(/.{1,160}/m).map do |text|
-        Txter::Request.new.deliver_message(text, txter_sms_phone_number).success?
+        if Txter.deliver(text, txter_sms_phone_number).success?
+          text.size
+        else
+          false
+        end
       end
     end
 
@@ -89,7 +93,7 @@ module Txter
         raise ArgumentError, "SMS Confirmation Message is too long. Limit it to 160 characters of unescaped text."
       end
 
-      response = Txter::Request.new.deliver_message(message, txter_sms_phone_number)
+      response = Txter.deliver(message, txter_sms_phone_number)
 
       if response.success?
         update_txter_sms_confirmation confirmation_code
@@ -105,7 +109,7 @@ module Txter
     def unblock_sms!
       return false unless txter_sms_blocked?
 
-      response = Txter::Request.new.unblock(txter_sms_phone_number)
+      response = Txter.unblock(txter_sms_phone_number)
       if response.success?
         self.txter_sms_blocked = 'false'
         save

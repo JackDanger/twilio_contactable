@@ -4,6 +4,9 @@ module Txter
       Txter::Gateway.current
     end
 
+    delegate :deliver, :to => :gateway
+    delegate :unblock, :to => :gateway
+
     def log(msg)
       if defined?(Rails)
         Rails.logger.info msg
@@ -42,7 +45,6 @@ module Txter
 end
 
 require File.join(File.dirname(__FILE__), 'configuration')
+require File.join(File.dirname(__FILE__), 'gateway')
 require File.join(File.dirname(__FILE__), 'contactable')
 require File.join(File.dirname(__FILE__), 'controller')
-require File.join(File.dirname(__FILE__), 'request')
-require File.join(File.dirname(__FILE__), 'response')
