@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-class FourInfoContactableTest < ActiveSupport::TestCase
+class TxterContactableTest < ActiveSupport::TestCase
 
   ValidationError = '<?xml version="1.0" encoding="UTF-8"?>
 <response>
@@ -37,9 +37,9 @@ class FourInfoContactableTest < ActiveSupport::TestCase
   context "contactable class" do
     setup {
       @klass = Class.new
-      @klass.send :include, FourInfo::Contactable
+      @klass.send :include, Txter::Contactable
     }
-    FourInfo::Contactable::Attributes.each do |attribute|
+    Txter::Contactable::Attributes.each do |attribute|
       should "begin with appropriate default for #{attribute}_column" do
         assert_equal attribute, @klass.send("#{attribute}_column")
       end
@@ -58,10 +58,10 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     }
 
     should "normalize phone number" do
-      assert_equal '5551234567', @user.four_info_sms_phone_number
+      assert_equal '5551234567', @user.txter_sms_phone_number
     end
     context "when phone number is blank" do
-      setup { @user.four_info_sms_phone_number = nil}
+      setup { @user.txter_sms_phone_number = nil}
       context "confirming phone number" do
         setup { @user.send_sms_confirmation! }
         should_not_change "any attributes" do
@@ -70,7 +70,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
       end
       context "sending message" do
         setup {
-          FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+          Txter::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
           @worked = @user.send_sms!('message')
         }
         should "not work" do assert !@worked end
@@ -81,45 +81,45 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     end
 
     context "when phone number exists" do
-      setup { @user.four_info_sms_phone_number = "206-555-5555"}
+      setup { @user.txter_sms_phone_number = "206-555-5555"}
       context "confirming phone number" do
         setup {
-          FourInfo::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
+          Txter::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
           @worked = @user.send_sms_confirmation!
         }
         should "work" do assert @worked end
         should "save confirmation number in proper attribute" do
-          assert_equal '123ABC', @user.four_info_sms_confirmation_code
+          assert @user.txter_sms_confirmation_code
         end
         should "set confirmation attempted time" do
-          assert @user.four_info_sms_confirmation_attempted > 3.minutes.ago
+          assert @user.txter_sms_confirmation_attempted > 3.minutes.ago
         end
         should_change "stored code" do
-          @user.four_info_sms_confirmation_code
+          @user.txter_sms_confirmation_code
         end
         should "not have number confirmed yet" do
           assert !@user.sms_confirmed?
         end
         context "calling sms_confirm_with(right_code)" do
-          setup { @user.sms_confirm_with(@user.four_info_sms_confirmation_code) }
+          setup { @user.sms_confirm_with(@user.txter_sms_confirmation_code) }
           should "work" do
             assert @worked
           end
           should "save the phone number into the confirmed attribute" do
-            assert_equal @user.four_info_sms_confirmed_phone_number,
-                         @user.four_info_sms_phone_number
+            assert_equal @user.txter_sms_confirmed_phone_number,
+                         @user.txter_sms_phone_number
           end
           should_change "confirmed phone number attribute" do
-            @user.four_info_sms_confirmed_phone_number
+            @user.txter_sms_confirmed_phone_number
           end
           context "and then attempting to confirm another number" do
             setup {
-              @user.four_info_sms_phone_number = "206-555-5555"
-              FourInfo::Request.any_instance.expects(:perform).returns(ValidationSuccess).once
+              @user.txter_sms_phone_number = "206-555-5555"
+              Txter::Request.any_instance.expects(:perform).returns(ValidationSuccess).once
               @user.send_sms_confirmation!
             }
             should "eliminate the previous confirmed phone number" do
-              assert @user.four_info_sms_confirmed_phone_number.blank?
+              assert @user.txter_sms_confirmed_phone_number.blank?
             end
             should "un-confirm the record" do
               assert !@user.sms_confirmed?
@@ -128,19 +128,19 @@ class FourInfoContactableTest < ActiveSupport::TestCase
         end
         context "calling sms_confirm_with(right code, wrong case)" do
           setup {
-            @downcased_code = @user.four_info_sms_confirmation_code.downcase
+            @downcased_code = @user.txter_sms_confirmation_code.downcase
             @worked = @user.sms_confirm_with(@downcased_code)
           }
           should "have good test data" do
             assert_not_equal @downcased_code,
-                             @user.four_info_sms_confirmation_code
+                             @user.txter_sms_confirmation_code
           end
           should "work" do
             assert @worked
           end
           should "save the phone number into the confirmed attribute" do
-            assert_equal @user.four_info_sms_confirmed_phone_number,
-                         @user.four_info_sms_phone_number
+            assert_equal @user.txter_sms_confirmed_phone_number,
+                         @user.txter_sms_phone_number
           end
         end
         context "calling sms_confirm_with(wrong_code)" do
@@ -149,37 +149,37 @@ class FourInfoContactableTest < ActiveSupport::TestCase
             assert !@worked
           end
           should "not save the phone number into the confirmed attribute" do
-            assert_not_equal @user.four_info_sms_confirmed_phone_number,
-                             @user.four_info_sms_phone_number
+            assert_not_equal @user.txter_sms_confirmed_phone_number,
+                             @user.txter_sms_phone_number
           end
           should_not_change "confirmed phone number attribute" do
-            @user.reload.four_info_sms_confirmed_phone_number
+            @user.reload.txter_sms_confirmed_phone_number
           end
         end
       end
       context "confirming phone number with a custom short code" do
         context "with expectations" do
           setup {
-            FourInfo.configure do |config|
+            Txter.configure do |config|
               config.short_code = '0005'
               config.client_id  = 1
               config.client_key = 'ABC123'
             end
             message = "long message blah blah MYCODE blah"
-            FourInfo.expects(:generate_confirmation_code).returns('MYCODE').once
-            FourInfo.expects(:confirmation_message).returns(message).once
-            FourInfo::Request.any_instance.expects(:deliver_message).with(message, @user.four_info_sms_phone_number).once
+            Txter.expects(:generate_confirmation_code).returns('MYCODE').once
+            Txter.expects(:confirmation_message).returns(message).once
+            Txter::Request.any_instance.expects(:deliver_message).with(message, @user.txter_sms_phone_number).once
             @user.send_sms_confirmation!
           }
         end
         context "(normal)" do
           setup {
-            FourInfo.configure do |config|
+            Txter.configure do |config|
               config.short_code = '0005'
               config.client_id  = 1
               config.client_key = 'ABC123'
             end
-            FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+            Txter::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
             @worked = @user.send_sms_confirmation!
           }
           should "work" do
@@ -189,15 +189,15 @@ class FourInfoContactableTest < ActiveSupport::TestCase
       end
       context "confirming phone number when the confirmation fails for some reason" do
         setup {
-          FourInfo::Request.any_instance.stubs(:perform).returns(ValidationError)
+          Txter::Request.any_instance.stubs(:perform).returns(ValidationError)
           @worked = @user.send_sms_confirmation!
         }
         should "not work" do assert !@worked end
         should "not save confirmation number" do
-          assert @user.four_info_sms_confirmation_code.blank?
+          assert @user.txter_sms_confirmation_code.blank?
         end
         should_not_change "stored code" do
-          @user.four_info_sms_confirmation_code
+          @user.txter_sms_confirmation_code
         end
       end
     end
@@ -205,7 +205,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     context "when the number is not confirmed" do
       context "sending a message" do
         setup {
-          FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+          Txter::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
           @result = @user.send_sms!('message')
         }
         should "send send no messages" do
@@ -215,7 +215,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     end
     context "when the number is blocked" do
       setup {
-        @user.four_info_sms_blocked = true
+        @user.txter_sms_blocked = true
         @user.save!
       }
       context "sending a message" do
@@ -227,7 +227,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     end
     context "when the number is confirmed" do
       setup {
-        FourInfo::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+        Txter::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
         @user.stubs(:sms_confirmed?).returns(true)
       }
       context "sending a message" do
@@ -261,7 +261,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
 
     context "when the number is not blocked" do
       setup {
-        FourInfo::Request.any_instance.expects(:perform).never
+        Txter::Request.any_instance.expects(:perform).never
       }
       context "unblocking" do
         setup { @worked = @user.unblock_sms! }
@@ -275,7 +275,7 @@ class FourInfoContactableTest < ActiveSupport::TestCase
     end
     context "when the number is blocked" do
       setup {
-        FourInfo::Request.any_instance.stubs(:perform).returns(UnblockSuccess)
+        Txter::Request.any_instance.stubs(:perform).returns(UnblockSuccess)
         @user.update_attributes!(:sms_blocked => true)
       }
       context "unblocking" do

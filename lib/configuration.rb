@@ -1,4 +1,4 @@
-module FourInfo
+module Txter
   class << self
     def mode
       @@mode ||= :test

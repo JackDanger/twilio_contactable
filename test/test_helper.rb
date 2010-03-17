@@ -6,15 +6,15 @@ require 'active_support'
 require 'active_record'
 require 'active_support/test_case'
 require 'shoulda'
-require File.join(File.dirname(__FILE__), "..", 'lib', 'four_info')
+require File.join(File.dirname(__FILE__), "..", 'lib', 'txter')
 
 # default test configuration
-FourInfo.configure do |config|
+Txter.configure do |config|
   config.client_id  = '1'
   config.client_key = 'ABCDEF'
 end
 
-FourInfo.mode = :test
+Txter.mode = :test
 config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
 ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
 ActiveRecord::Base.establish_connection(config[ENV['DB'] || 'sqlite3'])
@@ -32,11 +32,11 @@ ActiveRecord::Schema.define(:version => 1) do
 end
 
 class User < ActiveRecord::Base
-  include FourInfo::Contactable
+  include Txter::Contactable
 end
 
 # kill all network access
-module FourInfo
+module Txter
   class Request
     def start
       raise "You forgot to stub out your net requests!"

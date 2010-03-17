@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
      "lib/configuration.rb",
      "lib/contactable.rb",
      "lib/controller.rb",
-     "lib/four_info.rb",
+     "lib/txter.rb",
      "lib/request.rb",
      "lib/response.rb",
      "lib/templates/confirm.haml",
@@ -34,9 +34,9 @@ Gem::Specification.new do |s|
      "lib/templates/unblock.haml",
      "test/.gitignore",
      "test/database.yml",
-     "test/four_info_contactable_test.rb",
-     "test/four_info_controller_test.rb",
-     "test/four_info_module_test.rb",
+     "test/txter_contactable_test.rb",
+     "test/txter_controller_test.rb",
+     "test/txter_module_test.rb",
      "test/test_helper.rb"
   ]
   s.homepage = %q{http://github.com/JackDanger/4info}
@@ -45,9 +45,9 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{Send and receive SMS messages via 4info.com}
   s.test_files = [
-    "test/four_info_contactable_test.rb",
-     "test/four_info_controller_test.rb",
-     "test/four_info_module_test.rb",
+    "test/txter_contactable_test.rb",
+     "test/txter_controller_test.rb",
+     "test/txter_module_test.rb",
      "test/test_helper.rb"
   ]
 

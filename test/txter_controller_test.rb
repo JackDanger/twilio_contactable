@@ -5,13 +5,13 @@ require 'shoulda/action_controller'
 require 'shoulda/action_controller/macros'
 require 'shoulda/action_controller/matchers'
 
-class FourInfoController < ActionController::Base
-  include FourInfo::Controller
+class TxterController < ActionController::Base
+  include Txter::Controller
 
   sms_contactable User
 end
 ActionController::Routing::Routes.draw do |map|
-  map.route '*:url', :controller => 'four_info', :action => :index
+  map.route '*:url', :controller => 'txter', :action => :index
 end
 
 class UserWithSMSReceiving < User
@@ -19,7 +19,7 @@ class UserWithSMSReceiving < User
   end
 end
 
-class FourInfoControllerTest < ActionController::TestCase
+class TxterControllerTest < ActionController::TestCase
 
   context "with a user" do
     setup {
@@ -36,10 +36,10 @@ class FourInfoControllerTest < ActionController::TestCase
       }
       should_respond_with :success
       should "block user" do
-        assert @user.reload.four_info_sms_blocked?
+        assert @user.reload.txter_sms_blocked?
       end
       should_change "user block status" do
-        @user.reload.four_info_sms_blocked?
+        @user.reload.txter_sms_blocked?
       end
     end
     context "receiving MESSAGE" do
@@ -55,7 +55,7 @@ class FourInfoControllerTest < ActionController::TestCase
         }
         should_respond_with :success
         should "not block user" do
-          assert !@user.reload.four_info_sms_blocked?
+          assert !@user.reload.txter_sms_blocked?
         end
       end
       context "when the user is set up to receive" do
@@ -68,7 +68,7 @@ class FourInfoControllerTest < ActionController::TestCase
         }
         should_respond_with :success
         should "not block user" do
-          assert !@new_user.reload.four_info_sms_blocked?
+          assert !@new_user.reload.txter_sms_blocked?
         end
       end
     end

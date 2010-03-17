@@ -1,4 +1,4 @@
-module FourInfo
+module Txter
   class Request
 
     attr_accessor :config
@@ -6,14 +6,14 @@ module FourInfo
     attr_accessor :message
 
     def initialize
-      unless FourInfo.configured?
-        raise "You need to configure FourInfo before using it!"
+      unless Txter.configured?
+        raise "You need to configure Txter before using it!"
       end
-      self.config = FourInfo.configuration
+      self.config = Txter.configuration
     end
 
     def deliver_message(message, number)
-      self.number  = FourInfo.internationalize(number)
+      self.number  = Txter.internationalize(number)
       self.message = message
 
       xml = template(:deliver).render(self)
@@ -21,14 +21,14 @@ module FourInfo
     end
 
     def confirm(number)
-      self.number  = FourInfo.internationalize(number)
+      self.number  = Txter.internationalize(number)
 
       xml = template(:confirm).render(self)
       Response.new(perform(xml))
     end
 
     def unblock(number)
-      self.number = FourInfo.internationalize(number)
+      self.number = Txter.internationalize(number)
 
       xml = template(:unblock).render(self)
       Response.new(perform(xml))
@@ -46,16 +46,16 @@ module FourInfo
       end
 
       def perform(body)
-        if :live == FourInfo.mode
+        if :live == Txter.mode
           start do |http|
             http.post(
-              FourInfo.gateway.path,
+              Txter.gateway.path,
               body,
               {'Content-Type' => 'text/xml'}
             ).read_body
           end
         else
-          FourInfo.log "Would have sent to 4info.net: #{body}"
+          Txter.log "Would have sent to 4info.net: #{body}"
         end
       end
 
@@ -67,7 +67,7 @@ module FourInfo
                   config.proxy_username,
                   config.proxy_password) :
                 Net::HTTP
-        net.start(FourInfo.gateway.host, FourInfo.gateway.port) do |http|
+        net.start(Txter.gateway.host, Txter.gateway.port) do |http|
           yield http
         end
       end

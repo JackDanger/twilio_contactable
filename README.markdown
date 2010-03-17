@@ -8,16 +8,16 @@ If you're using 4info.com as your SMS gateway this gem will give you a painless 
 Setting Up Your Model
 =====
 
-Include FourInfo::Contactable into your User class or whatever you're using to represent an entity with a phone number. 
+Include Txter::Contactable into your User class or whatever you're using to represent an entity with a phone number. 
 
     class User < ActiveRecord::Base
-      include FourInfo::Contactable
+      include Txter::Contactable
     end
 
 You can also specify which attributes you'd like to use instead of the defaults
 
     class User < ActiveRecord::Base
-      include FourInfo::Contactable
+      include Txter::Contactable
 
       sms_phone_number_column            :mobile_number
       sms_blocked_column                 :is_sms_blocked
@@ -31,15 +31,15 @@ You can also specify which attributes you'd like to use instead of the defaults
 Turning the thing on
 ---
 
-Because it can be expensive to send TXTs accidentally, it's required that you manually configure FourInfo in your app. Put this line in config/environments/production.rb or anything that loads _only_ in your production environment:
+Because it can be expensive to send TXTs accidentally, it's required that you manually configure Txter in your app. Put this line in config/environments/production.rb or anything that loads _only_ in your production environment:
 
-    FourInfo.mode = :live
+    Txter.mode = :live
 
 Skipping this step (or adding any other value) will prevent TXTs from actually being sent.
 
 You'll also want to configure your setup with your client_id and client_key. Put this in the same file as above or in a separate initializer if you wish:
 
-    FourInfo.configure do |config|
+    Txter.configure do |config|
       # these two are required:
       # (replace them with your actual account info)
       config.client_id = 12345
@@ -93,19 +93,19 @@ Receiving Messages From 4info.com
 ====
 
 You can also receive data posted to you from 4info.com. This is how you'll receive messages and notices that users have been blocked.
-All you need is to create a bare controller and include FourInfo::Controller into it. Then specify which Ruby class you're using as a contactable user model (likely User)
+All you need is to create a bare controller and include Txter::Controller into it. Then specify which Ruby class you're using as a contactable user model (likely User)
 
 
     class SMSController < ApplicationController
-      include FourInfo::Controller
+      include Txter::Controller
 
-      sms_contactable User # or whichever class you included FourInfo::Contactable into
+      sms_contactable User # or whichever class you included Txter::Contactable into
     end
 
 And hook this up in your routes.rb file like so:
 
     ActionController::Routing::Routes.draw do |map|
-      map.route '4info', :controller => 'four_info', :action => :index
+      map.route '4info', :controller => 'txter', :action => :index
     end
 
 Now just tell 4info.com to POST messages and block notices to you at:

@@ -1,4 +1,4 @@
-module FourInfo
+module Txter
   class Response
     def initialize(xml)
       gem 'hpricot'

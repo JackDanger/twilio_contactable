@@ -1,4 +1,4 @@
-module FourInfo
+module Txter
   module Controller
 
     def self.included(controller)
@@ -25,7 +25,7 @@ module FourInfo
       def recieve_xml
 
         unless defined?(@@contactable_class)
-          raise RuntimeError, "Please define your user class in the FourInfo controller via the 'sms_contactable' method"
+          raise RuntimeError, "Please define your user class in the Txter controller via the 'sms_contactable' method"
         end
 
         request = params[:request]
@@ -33,7 +33,7 @@ module FourInfo
         case request['type']
         when 'BLOCK'
           @contactable = find_contactable(request[:block][:recipient][:id])
-          @contactable.four_info_sms_blocked = true
+          @contactable.txter_sms_blocked = true
           @contactable.save!
         when 'MESSAGE'
           @contactable = find_contactable(request[:message][:sender][:id])
