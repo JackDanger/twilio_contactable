@@ -1,6 +1,8 @@
 module Txter
   class Gateway4info < Txter::Gateway
 
+    API = 'http://gateway.4info.net/msg'
+
     def self.deliver(message, number)
       Gateway4info.perform Request.new.deliver_message(message, number)
     end
@@ -8,7 +10,7 @@ module Txter
     def self.perform(body)
       if :live == Txter.mode
         require 'net/http'
-        uri = URI.parse 'http://gateway.4info.net/msg'
+        uri = URI.parse API
         body = start do |http|
           http.post(
                      uri.path,
@@ -25,14 +27,16 @@ module Txter
     protected
 
       def self.start
-        net = config.proxy_address ?
+        c = Txter.configuration
+        net = c.proxy_address ?
                 Net::HTTP::Proxy(
-                  config.proxy_address,
-                  config.proxy_port,
-                  config.proxy_username,
-                  config.proxy_password) :
+                  c.proxy_address,
+                  c.proxy_port,
+                  c.proxy_username,
+                  c.proxy_password) :
                 Net::HTTP
-        net.start(Txter.gateway.host, Txter.gateway.port) do |http|
+        uri = URI.parse API
+        net.start(uri.host, uri.port) do |http|
           yield http
         end
       end

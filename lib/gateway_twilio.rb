@@ -5,10 +5,18 @@ module Txter
 
     class << self
 
-      def deliver(message, to, from)
-        post 'To'   => to,
-             'From' => from,
-             'Body' => message
+      def deliver(message, to, from = nil)
+
+        from ||= Txter.configuration.default_from_phone_number
+        raise "'From' number required for Twilio" unless from
+
+        response = post 'To'   => to,
+                       'From' => from,
+                       'Body' => message
+
+        Net::HTTPCreated == response.code_type ?
+                              Txter::Gateway::Success :
+                              Txter::Gateway::Error
       end
 
       def account
