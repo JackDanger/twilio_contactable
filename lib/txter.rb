@@ -1,8 +1,7 @@
 module Txter
   class << self
     def gateway
-      require 'net/http'
-      URI.parse 'http://gateway.4info.net/msg'
+      Txter::Gateway.current
     end
 
     def log(msg)

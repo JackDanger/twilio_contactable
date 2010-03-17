@@ -70,7 +70,7 @@ class TxterContactableTest < ActiveSupport::TestCase
       end
       context "sending message" do
         setup {
-          Txter::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+          Txter::Request.any_instance.stubs(:perform).returns(Success)
           @worked = @user.send_sms!('message')
         }
         should "not work" do assert !@worked end
@@ -84,7 +84,7 @@ class TxterContactableTest < ActiveSupport::TestCase
       setup { @user.txter_sms_phone_number = "206-555-5555"}
       context "confirming phone number" do
         setup {
-          Txter::Request.any_instance.stubs(:perform).returns(ValidationSuccess)
+          Txter::Request.any_instance.stubs(:perform).returns(Success)
           @worked = @user.send_sms_confirmation!
         }
         should "work" do assert @worked end
@@ -115,7 +115,7 @@ class TxterContactableTest < ActiveSupport::TestCase
           context "and then attempting to confirm another number" do
             setup {
               @user.txter_sms_phone_number = "206-555-5555"
-              Txter::Request.any_instance.expects(:perform).returns(ValidationSuccess).once
+              Txter::Request.any_instance.expects(:perform).returns(Success).once
               @user.send_sms_confirmation!
             }
             should "eliminate the previous confirmed phone number" do
@@ -179,7 +179,7 @@ class TxterContactableTest < ActiveSupport::TestCase
               config.client_id  = 1
               config.client_key = 'ABC123'
             end
-            Txter::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+            Txter::Request.any_instance.stubs(:perform).returns(Success)
             @worked = @user.send_sms_confirmation!
           }
           should "work" do
@@ -189,7 +189,7 @@ class TxterContactableTest < ActiveSupport::TestCase
       end
       context "confirming phone number when the confirmation fails for some reason" do
         setup {
-          Txter::Request.any_instance.stubs(:perform).returns(ValidationError)
+          Txter::Request.any_instance.stubs(:perform).returns(Error)
           @worked = @user.send_sms_confirmation!
         }
         should "not work" do assert !@worked end
@@ -205,7 +205,7 @@ class TxterContactableTest < ActiveSupport::TestCase
     context "when the number is not confirmed" do
       context "sending a message" do
         setup {
-          Txter::Request.any_instance.stubs(:perform).returns(SendMsgSuccess)
+          Txter::Request.any_instance.stubs(:perform).returns(Success)
           @result = @user.send_sms!('message')
         }
         should "send send no messages" do

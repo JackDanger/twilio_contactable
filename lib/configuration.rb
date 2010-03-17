@@ -26,6 +26,7 @@ module Txter
 
     attr_accessor :client_id
     attr_accessor :client_key
+    attr_accessor :gateway
     attr_accessor :short_code
     attr_accessor :proxy_address
     attr_accessor :proxy_port

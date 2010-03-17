@@ -47,28 +47,9 @@ module Txter
 
       def perform(body)
         if :live == Txter.mode
-          start do |http|
-            http.post(
-              Txter.gateway.path,
-              body,
-              {'Content-Type' => 'text/xml'}
-            ).read_body
-          end
+          Txter.gateway.perform
         else
           Txter.log "Would have sent to 4info.net: #{body}"
-        end
-      end
-
-      def start
-        net = config.proxy_address ?
-                Net::HTTP::Proxy(
-                  config.proxy_address,
-                  config.proxy_port,
-                  config.proxy_username,
-                  config.proxy_password) :
-                Net::HTTP
-        net.start(Txter.gateway.host, Txter.gateway.port) do |http|
-          yield http
         end
       end
   end

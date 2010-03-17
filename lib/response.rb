@@ -1,6 +1,7 @@
 module Txter
   class Response
     def initialize(xml)
+      p xml
       gem 'hpricot'
       require 'hpricot'
       @xml  = xml
