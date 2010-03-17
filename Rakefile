@@ -6,7 +6,7 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "4info"
     gem.summary = %Q{Send and receive SMS messages via 4info.com}
-    gem.description = %Q{A complete Ruby API for handling SMS messages via 4info.com}
+    gem.description = %Q{DEPRECATED in favor of the Txter gem - http://github.com/JackDanger/txter}
     gem.email = "gitcommit@6brand.com"
     gem.homepage = "http://github.com/JackDanger/4info"
     gem.authors = ["Jack Danger Canty"]
