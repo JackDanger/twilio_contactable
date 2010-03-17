@@ -4,14 +4,14 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "4info"
-    gem.summary = %Q{Send and receive SMS messages via 4info.com}
-    gem.description = %Q{DEPRECATED in favor of the Txter gem - http://github.com/JackDanger/txter}
+    gem.name = "txter"
+    gem.summary = %Q{Send and receive SMS messages simply via the Twilio gateway or the 4info.com gateway}
+    gem.description = %Q{Drop-in functionality to let Ruby apps send and receive TXT messages}
     gem.email = "gitcommit@6brand.com"
-    gem.homepage = "http://github.com/JackDanger/4info"
+    gem.homepage = "http://github.com/JackDanger/txter"
     gem.authors = ["Jack Danger Canty"]
-    gem.add_dependency "hpricot", ">= 0"
-    gem.add_dependency "haml", ">= 0"
+    # gem.add_dependency "hpricot", ">= 0"
+    # gem.add_dependency "haml", ">= 0"
     gem.add_development_dependency "shoulda", ">= 0"
     gem.add_development_dependency "mocha", ">= 0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
@@ -22,7 +22,7 @@ rescue LoadError
 end
 
 require 'rake/testtask'
-desc "Test 4info"
+desc "Test Txter"
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
   test.pattern = 'test/**/*_test.rb'
