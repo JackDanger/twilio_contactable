@@ -11,14 +11,14 @@ module Txter
       if :live == Txter.mode
         require 'net/http'
         uri = URI.parse API
-        body = start do |http|
+        received = start do |http|
           http.post(
                      uri.path,
                      body,
                      {'Content-Type' => 'text/xml'}
           ).read_body
         end
-        Response.new(body)
+        Response.new(received)
       else
         Txter.log "Would have sent to 4info.net: #{body}"
       end
