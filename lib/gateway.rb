@@ -41,5 +41,5 @@ module Txter
     end
   end
 end
-require File.join File.dirname(__FILE__), 'gateway_4info'
-require File.join File.dirname(__FILE__), 'gateway_twilio'
+require File.join(File.dirname(__FILE__), 'gateway_4info')
+require File.join(File.dirname(__FILE__), 'gateway_twilio')
