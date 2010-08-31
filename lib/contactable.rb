@@ -1,5 +1,5 @@
 module TwilioContactable
-  module User
+  module Contactable
 
     Attributes = [
       :phone_number,

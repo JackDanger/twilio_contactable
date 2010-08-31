@@ -5,10 +5,8 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
   Success = TwilioContactable::Gateway::Response.new(:status => :success)
   Error   = TwilioContactable::Gateway::Response.new(:status => :error)
 
-  context "contactable class" do
+  context "configuration" do
     setup {
-      @klass = Class.new
-      @klass.send :include, TwilioContactable::Contactable
       TwilioContactable.configure do |config|
         config.client_id  = 12345
         config.client_key = 'ABC123'
@@ -17,12 +15,18 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
     }
     TwilioContactable::Contactable::Attributes.each do |attribute|
       should "begin with appropriate default for #{attribute}_column" do
+        @klass = Class.new
+        @klass.send :include, TwilioContactable::Contactable
         assert_equal attribute, @klass.send("#{attribute}_column")
       end
       should "allow setting #{attribute}_column" do
         new_column_name = :custom_column
-        @klass.send "#{attribute}_column", new_column_name
-        assert_equal new_column_name, @klass.send("#{attribute}_column")
+        @klass = Class.new
+        @klass.send :include, TwilioContactable::Contactable
+        @klass.twilio_contactable do |config|
+          config.send("#{attribute}_column=", new_column_name)
+        end
+        assert_equal new_column_name, @klass.twilio_contactable.send("#{attribute}_column")
       end
     end
   end
@@ -30,11 +34,11 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
   context "contactable instance" do
     setup {
       User.delete_all
-      @user = User.create! User.sms_phone_number_column => '(555) 123-4567'
+      @user = User.create! :phone_number => '(555) 123-4567'
     }
 
     should "normalize phone number" do
-      assert_equal '5551234567', @user.twilio_contactable_sms_phone_number
+      assert_equal '5551234567', @user.formatted_phone_number
     end
     context "when phone number is blank" do
       setup { @user.twilio_contactable_sms_phone_number = nil}
