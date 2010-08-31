@@ -25,17 +25,14 @@ Gem::Specification.new do |s|
      "lib/contactable.rb",
      "lib/controller.rb",
      "lib/gateway.rb",
-     "lib/gateway_4info.rb",
-     "lib/gateway_twilio.rb",
      "lib/twilio_contactable.rb",
      "test/.gitignore",
      "test/database.yml",
-     "test/gateway_4info_test.rb",
-     "test/gateway_twilio_test.rb",
      "test/test_helper.rb",
-     "test/twilio_contactable_contactable_test.rb",
-     "test/twilio_contactable_controller_test.rb",
-     "test/twilio_contactable_module_test.rb"
+     "test/txter_contactable_test.rb",
+     "test/txter_controller_test.rb",
+     "test/txter_module_test.rb",
+     "twilio_contactable.gemspec"
   ]
   s.homepage = %q{http://github.com/JackDanger/twilio_contactable}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -43,12 +40,10 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{Help authorize the users of your Rails apps to confirm and use their phone numbers}
   s.test_files = [
-    "test/gateway_4info_test.rb",
-     "test/gateway_twilio_test.rb",
-     "test/test_helper.rb",
-     "test/twilio_contactable_contactable_test.rb",
-     "test/twilio_contactable_controller_test.rb",
-     "test/twilio_contactable_module_test.rb"
+    "test/test_helper.rb",
+     "test/txter_contactable_test.rb",
+     "test/txter_controller_test.rb",
+     "test/txter_module_test.rb"
   ]
 
   if s.respond_to? :specification_version then
