@@ -28,7 +28,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
     }
 
     should "normalize phone number" do
-      assert_equal '5551234567', @user.formatted_phone_number
+      assert_equal '+15551234567', @user.formatted_phone_number
     end
     context "when phone number is blank" do
       setup { @user._TC_phone_number = nil}

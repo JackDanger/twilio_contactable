@@ -51,7 +51,7 @@ module TwilioContactable
         model.class_eval do
           def format_phone_number
             self._TC_formatted_phone_number =
-              TwilioContactable.numerize(_TC_phone_number)
+              TwilioContactable.internationalize(_TC_phone_number)
           end
         end
       end
