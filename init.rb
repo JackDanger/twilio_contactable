@@ -1,3 +1,3 @@
 # Include hook code here
 
-require 'txter'
+require 'twilio_contactable'

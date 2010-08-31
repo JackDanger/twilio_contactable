@@ -1,4 +1,4 @@
-module Txter
+module TwilioContactable
   class Gateway
     class Response
       def initialize(*args)
@@ -9,8 +9,8 @@ module Txter
         :success == @options[:status]
       end
     end
-    Success = Txter::Gateway::Response.new(:status => :success)
-    Error   = Txter::Gateway::Response.new(:status => :error)
+    Success = TwilioContactable::Gateway::Response.new(:status => :success)
+    Error   = TwilioContactable::Gateway::Response.new(:status => :error)
 
     API_VERSION   = '2008-08-01'
 
@@ -18,7 +18,7 @@ module Txter
 
       def deliver(message, to, from = nil)
 
-        from ||= Txter.configuration.default_from_phone_number
+        from ||= TwilioContactable.configuration.default_from_phone_number
         raise "'From' number required for Twilio" unless from
 
         response = post 'To'   => to,
@@ -26,20 +26,20 @@ module Txter
                        'Body' => message
 
         Net::HTTPCreated == response.code_type ?
-                              Txter::Gateway::Success :
-                              Txter::Gateway::Error
+                              TwilioContactable::Gateway::Success :
+                              TwilioContactable::Gateway::Error
       end
 
       def account
         @account ||= begin
-          if Txter.configuration.client_id.blank? ||
-             Txter.configuration.client_key.blank?
-             raise "Add your Twilio account id (as client_id) and token (as client_key) to the Txter.configure block"
+          if TwilioContactable.configuration.client_id.blank? ||
+             TwilioContactable.configuration.client_key.blank?
+             raise "Add your Twilio account id (as client_id) and token (as client_key) to the TwilioContactable.configure block"
           end
 
           Twilio::RestAccount.new(
-                      Txter.configuration.client_id,
-                      Txter.configuration.client_key
+                      TwilioContactable.configuration.client_id,
+                      TwilioContactable.configuration.client_key
                     )
         end
       end
@@ -47,7 +47,7 @@ module Txter
       protected
 
         def post(data = {})
-          account.request "/#{API_VERSION}/Accounts/#{Txter.configuration.client_id}/SMS/Messages",
+          account.request "/#{API_VERSION}/Accounts/#{TwilioContactable.configuration.client_id}/SMS/Messages",
                           "POST",
                           data
         end

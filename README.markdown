@@ -103,7 +103,7 @@ All you need is to create a bare controller and include Txter::Controller into i
 And hook this up in your routes.rb file like so:
 
     ActionController::Routing::Routes.draw do |map|
-      map.route '4info', :controller => 'txter', :action => :index
+      map.route '4info', :controller => 'twilio_contactable', :action => :index
     end
 
 Now just tell 4info.com to POST messages and block notices to you at:

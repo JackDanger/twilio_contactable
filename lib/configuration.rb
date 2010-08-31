@@ -1,4 +1,4 @@
-module Txter
+module TwilioContactable
   class << self
     def mode
       @@mode ||= :test

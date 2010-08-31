@@ -5,13 +5,13 @@ require 'shoulda/action_controller'
 require 'shoulda/action_controller/macros'
 require 'shoulda/action_controller/matchers'
 
-class TxterController < ActionController::Base
-  include Txter::Controller
+class TwilioContactableController < ActionController::Base
+  include TwilioContactable::Controller
 
   sms_contactable User
 end
 ActionController::Routing::Routes.draw do |map|
-  map.route '*:url', :controller => 'txter', :action => :index
+  map.route '*:url', :controller => 'twilio_contactable', :action => :index
 end
 
 class UserWithSMSReceiving < User
@@ -19,7 +19,7 @@ class UserWithSMSReceiving < User
   end
 end
 
-class TxterControllerTest < ActionController::TestCase
+class TwilioContactableControllerTest < ActionController::TestCase
 
   context "with a user" do
     setup {
@@ -36,10 +36,10 @@ class TxterControllerTest < ActionController::TestCase
       }
       should_respond_with :success
       should "block user" do
-        assert @user.reload.txter_sms_blocked?
+        assert @user.reload.twilio_contactable_sms_blocked?
       end
       should_change "user block status" do
-        @user.reload.txter_sms_blocked?
+        @user.reload.twilio_contactable_sms_blocked?
       end
     end
     context "receiving MESSAGE" do
@@ -55,7 +55,7 @@ class TxterControllerTest < ActionController::TestCase
         }
         should_respond_with :success
         should "not block user" do
-          assert !@user.reload.txter_sms_blocked?
+          assert !@user.reload.twilio_contactable_sms_blocked?
         end
       end
       context "when the user is set up to receive" do
@@ -68,7 +68,7 @@ class TxterControllerTest < ActionController::TestCase
         }
         should_respond_with :success
         should "not block user" do
-          assert !@new_user.reload.txter_sms_blocked?
+          assert !@new_user.reload.twilio_contactable_sms_blocked?
         end
       end
     end

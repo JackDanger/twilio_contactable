@@ -6,16 +6,16 @@ require 'active_support'
 require 'active_record'
 require 'active_support/test_case'
 require 'shoulda'
-require File.join(File.dirname(__FILE__), "..", 'lib', 'txter')
+require File.join(File.dirname(__FILE__), "..", 'lib', 'twilio_contactable')
 
 # default test configuration
-Txter.configure do |config|
+TwilioContactable.configure do |config|
   config.client_id  = '1'
   config.client_key = 'ABCDEF'
   config.gateway    = 'test'
 end
 
-Txter.mode = :test
+TwilioContactable.mode = :test
 config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
 ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
 ActiveRecord::Base.establish_connection(config[ENV['DB'] || 'sqlite3'])
@@ -33,11 +33,11 @@ ActiveRecord::Schema.define(:version => 1) do
 end
 
 class User < ActiveRecord::Base
-  include Txter::Contactable
+  include TwilioContactable::Contactable
 end
 
 # kill all network access
-module Txter
+module TwilioContactable
   class Request
     def start
       raise "You forgot to stub out your net requests!"

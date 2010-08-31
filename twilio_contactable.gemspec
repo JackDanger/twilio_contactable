@@ -33,9 +33,9 @@ Gem::Specification.new do |s|
      "test/gateway_4info_test.rb",
      "test/gateway_twilio_test.rb",
      "test/test_helper.rb",
-     "test/txter_contactable_test.rb",
-     "test/txter_controller_test.rb",
-     "test/txter_module_test.rb"
+     "test/twilio_contactable_contactable_test.rb",
+     "test/twilio_contactable_controller_test.rb",
+     "test/twilio_contactable_module_test.rb"
   ]
   s.homepage = %q{http://github.com/JackDanger/twilio_contactable}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -46,9 +46,9 @@ Gem::Specification.new do |s|
     "test/gateway_4info_test.rb",
      "test/gateway_twilio_test.rb",
      "test/test_helper.rb",
-     "test/txter_contactable_test.rb",
-     "test/txter_controller_test.rb",
-     "test/txter_module_test.rb"
+     "test/twilio_contactable_contactable_test.rb",
+     "test/twilio_contactable_controller_test.rb",
+     "test/twilio_contactable_module_test.rb"
   ]
 
   if s.respond_to? :specification_version then

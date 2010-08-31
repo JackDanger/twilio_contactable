@@ -1,7 +1,7 @@
-module Txter
+module TwilioContactable
   class << self
     def gateway
-      Txter::Gateway.current
+      TwilioContactable::Gateway.current
     end
 
     delegate :deliver, :to => :gateway

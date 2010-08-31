@@ -1,21 +1,21 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-class TxterContactableTest < ActiveSupport::TestCase
+class TwilioContactableContactableTest < ActiveSupport::TestCase
 
-  Success = Txter::Gateway::Response.new(:status => :success)
-  Error   = Txter::Gateway::Response.new(:status => :error)
+  Success = TwilioContactable::Gateway::Response.new(:status => :success)
+  Error   = TwilioContactable::Gateway::Response.new(:status => :error)
 
   context "contactable class" do
     setup {
       @klass = Class.new
-      @klass.send :include, Txter::Contactable
-      Txter.configure do |config|
+      @klass.send :include, TwilioContactable::Contactable
+      TwilioContactable.configure do |config|
         config.client_id  = 12345
         config.client_key = 'ABC123'
         config.gateway    = 'test'
       end
     }
-    Txter::Contactable::Attributes.each do |attribute|
+    TwilioContactable::Contactable::Attributes.each do |attribute|
       should "begin with appropriate default for #{attribute}_column" do
         assert_equal attribute, @klass.send("#{attribute}_column")
       end
@@ -34,10 +34,10 @@ class TxterContactableTest < ActiveSupport::TestCase
     }
 
     should "normalize phone number" do
-      assert_equal '5551234567', @user.txter_sms_phone_number
+      assert_equal '5551234567', @user.twilio_contactable_sms_phone_number
     end
     context "when phone number is blank" do
-      setup { @user.txter_sms_phone_number = nil}
+      setup { @user.twilio_contactable_sms_phone_number = nil}
       context "confirming phone number" do
         setup { @user.send_sms_confirmation! }
         should_not_change "any attributes" do
@@ -46,7 +46,7 @@ class TxterContactableTest < ActiveSupport::TestCase
       end
       context "sending message" do
         setup {
-          Txter.gateway.stubs(:perform).returns(Success)
+          TwilioContactable.gateway.stubs(:perform).returns(Success)
           @worked = @user.send_sms!('message')
         }
         should "not work" do assert !@worked end
@@ -57,45 +57,45 @@ class TxterContactableTest < ActiveSupport::TestCase
     end
 
     context "when phone number exists" do
-      setup { @user.txter_sms_phone_number = "206-555-5555"}
+      setup { @user.twilio_contactable_sms_phone_number = "206-555-5555"}
       context "confirming phone number" do
         setup {
-          Txter::Request.any_instance.stubs(:perform).returns(Success)
+          TwilioContactable::Request.any_instance.stubs(:perform).returns(Success)
           @worked = @user.send_sms_confirmation!
         }
         should "work" do assert @worked end
         should "save confirmation number in proper attribute" do
-          assert @user.txter_sms_confirmation_code
+          assert @user.twilio_contactable_sms_confirmation_code
         end
         should "set confirmation attempted time" do
-          assert @user.txter_sms_confirmation_attempted > 3.minutes.ago
+          assert @user.twilio_contactable_sms_confirmation_attempted > 3.minutes.ago
         end
         should_change "stored code" do
-          @user.txter_sms_confirmation_code
+          @user.twilio_contactable_sms_confirmation_code
         end
         should "not have number confirmed yet" do
           assert !@user.sms_confirmed?
         end
         context "calling sms_confirm_with(right_code)" do
-          setup { @user.sms_confirm_with(@user.txter_sms_confirmation_code) }
+          setup { @user.sms_confirm_with(@user.twilio_contactable_sms_confirmation_code) }
           should "work" do
             assert @worked
           end
           should "save the phone number into the confirmed attribute" do
-            assert_equal @user.txter_sms_confirmed_phone_number,
-                         @user.txter_sms_phone_number
+            assert_equal @user.twilio_contactable_sms_confirmed_phone_number,
+                         @user.twilio_contactable_sms_phone_number
           end
           should_change "confirmed phone number attribute" do
-            @user.txter_sms_confirmed_phone_number
+            @user.twilio_contactable_sms_confirmed_phone_number
           end
           context "and then attempting to confirm another number" do
             setup {
-              @user.txter_sms_phone_number = "206-555-5555"
-              Txter.stubs(:deliver).returns(Success).once
+              @user.twilio_contactable_sms_phone_number = "206-555-5555"
+              TwilioContactable.stubs(:deliver).returns(Success).once
               @user.send_sms_confirmation!
             }
             should "eliminate the previous confirmed phone number" do
-              assert @user.txter_sms_confirmed_phone_number.blank?
+              assert @user.twilio_contactable_sms_confirmed_phone_number.blank?
             end
             should "un-confirm the record" do
               assert !@user.sms_confirmed?
@@ -104,19 +104,19 @@ class TxterContactableTest < ActiveSupport::TestCase
         end
         context "calling sms_confirm_with(right code, wrong case)" do
           setup {
-            @downcased_code = @user.txter_sms_confirmation_code.downcase
+            @downcased_code = @user.twilio_contactable_sms_confirmation_code.downcase
             @worked = @user.sms_confirm_with(@downcased_code)
           }
           should "have good test data" do
             assert_not_equal @downcased_code,
-                             @user.txter_sms_confirmation_code
+                             @user.twilio_contactable_sms_confirmation_code
           end
           should "work" do
             assert @worked
           end
           should "save the phone number into the confirmed attribute" do
-            assert_equal @user.txter_sms_confirmed_phone_number,
-                         @user.txter_sms_phone_number
+            assert_equal @user.twilio_contactable_sms_confirmed_phone_number,
+                         @user.twilio_contactable_sms_phone_number
           end
         end
         context "calling sms_confirm_with(wrong_code)" do
@@ -125,39 +125,39 @@ class TxterContactableTest < ActiveSupport::TestCase
             assert !@worked
           end
           should "not save the phone number into the confirmed attribute" do
-            assert_not_equal @user.txter_sms_confirmed_phone_number,
-                             @user.txter_sms_phone_number
+            assert_not_equal @user.twilio_contactable_sms_confirmed_phone_number,
+                             @user.twilio_contactable_sms_phone_number
           end
           should_not_change "confirmed phone number attribute" do
-            @user.reload.txter_sms_confirmed_phone_number
+            @user.reload.twilio_contactable_sms_confirmed_phone_number
           end
         end
       end
       context "confirming phone number with a custom short code" do
         context "with expectations" do
           setup {
-            Txter.configure do |config|
+            TwilioContactable.configure do |config|
               config.short_code = '0005'
               config.gateway    = 'test'
               config.client_id  = 1
               config.client_key = 'ABC123'
             end
             message = "long message blah blah MYCODE blah"
-            Txter.expects(:generate_confirmation_code).returns('MYCODE').once
-            Txter.expects(:confirmation_message).returns(message).once
-            Txter::Request.any_instance.expects(:deliver_message).with(message, @user.txter_sms_phone_number).once
+            TwilioContactable.expects(:generate_confirmation_code).returns('MYCODE').once
+            TwilioContactable.expects(:confirmation_message).returns(message).once
+            TwilioContactable::Request.any_instance.expects(:deliver_message).with(message, @user.twilio_contactable_sms_phone_number).once
             @user.send_sms_confirmation!
           }
         end
         context "(normal)" do
           setup {
-            Txter.configure do |config|
+            TwilioContactable.configure do |config|
               config.short_code = '0005'
               config.gateway    = 'test'
               config.client_id  = 1
               config.client_key = 'ABC123'
             end
-            Txter::Request.any_instance.stubs(:perform).returns(Success)
+            TwilioContactable::Request.any_instance.stubs(:perform).returns(Success)
             @worked = @user.send_sms_confirmation!
           }
           should "work" do
@@ -167,15 +167,15 @@ class TxterContactableTest < ActiveSupport::TestCase
       end
       context "confirming phone number when the confirmation fails for some reason" do
         setup {
-          Txter.stubs(:deliver).returns(Error)
+          TwilioContactable.stubs(:deliver).returns(Error)
           @worked = @user.send_sms_confirmation!
         }
         should "not work" do assert !@worked end
         should "not save confirmation number" do
-          assert @user.txter_sms_confirmation_code.blank?
+          assert @user.twilio_contactable_sms_confirmation_code.blank?
         end
         should_not_change "stored code" do
-          @user.txter_sms_confirmation_code
+          @user.twilio_contactable_sms_confirmation_code
         end
       end
     end
@@ -183,7 +183,7 @@ class TxterContactableTest < ActiveSupport::TestCase
     context "when the number is not confirmed" do
       context "sending a message" do
         setup {
-          Txter::Request.any_instance.stubs(:perform).returns(Success)
+          TwilioContactable::Request.any_instance.stubs(:perform).returns(Success)
           @result = @user.send_sms!('message')
         }
         should "send send no messages" do
@@ -193,7 +193,7 @@ class TxterContactableTest < ActiveSupport::TestCase
     end
     context "when the number is blocked" do
       setup {
-        @user.txter_sms_blocked = true
+        @user.twilio_contactable_sms_blocked = true
         @user.save!
       }
       context "sending a message" do
@@ -205,7 +205,7 @@ class TxterContactableTest < ActiveSupport::TestCase
     end
     context "when the number is confirmed" do
       setup {
-        Txter::Request.any_instance.stubs(:perform).returns(Success)
+        TwilioContactable::Request.any_instance.stubs(:perform).returns(Success)
         @user.stubs(:sms_confirmed?).returns(true)
       }
       context "sending a message" do
@@ -239,7 +239,7 @@ class TxterContactableTest < ActiveSupport::TestCase
 
     context "when the number is not blocked" do
       setup {
-        Txter::Request.any_instance.expects(:perform).never
+        TwilioContactable::Request.any_instance.expects(:perform).never
       }
       context "unblocking" do
         setup { @worked = @user.unblock_sms! }
@@ -253,7 +253,7 @@ class TxterContactableTest < ActiveSupport::TestCase
     end
     context "when the number is blocked" do
       setup {
-        Txter::Request.any_instance.stubs(:perform).returns(Success)
+        TwilioContactable::Request.any_instance.stubs(:perform).returns(Success)
         @user.update_attributes!(:sms_blocked => true)
       }
       context "unblocking" do
