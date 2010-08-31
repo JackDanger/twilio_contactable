@@ -1,21 +1,30 @@
-Txter
+Twilo Contactable
 =====
 
-Send and receive TXT messages via either Twilio or (not recommended) 4info.com
+Twilo makes voice and SMS interactions easy. But if you want to be able to seamlessly validate your user's phone numbers for
+both voice and text there's a lot of work you'll have to do in your Rails app. Unless you use this gem.
+
+Why bother?
+=====
+
+Unless you're programming Ruby like it's PHP you don't enjoy passing strings around and writing all procedural code. This gem lets you
+ask for a phone number from your users, confirm their ownership of it via SMS or Voice or both, and keep track of whether the number is
+still validated when they edit it.
+
 
 Setting Up Your Model
 =====
 
-Include Txter::Contactable into your User class or whatever you're using to represent an entity with a phone number. 
+Include Twilio::Contactable into your User class or whatever you're using to represent an entity with a phone number. 
 
     class User < ActiveRecord::Base
-      include Txter::Contactable
+      include TwilioContactable::Contactable
     end
 
 You can also specify which attributes you'd like to use instead of the defaults
 
     class User < ActiveRecord::Base
-      include Txter::Contactable
+      include TwilioContactable::Contactable
 
       sms_phone_number_column            :mobile_number
       sms_blocked_column                 :is_sms_blocked
@@ -29,15 +38,15 @@ You can also specify which attributes you'd like to use instead of the defaults
 Turning the thing on
 ---
 
-Because it can be expensive to send TXTs accidentally, it's required that you manually configure Txter in your app. Put this line in config/environments/production.rb or anything that loads _only_ in your production environment:
+Because it can be expensive to send TXTs accidentally, it's required that you manually configure TwilioContactable in your app. Put this line in config/environments/production.rb or anything that loads _only_ in your production environment:
 
-    Txter.mode = :live
+    TwilioContactable.mode = :live
 
 Skipping this step (or adding any other value) will prevent TXTs from actually being sent.
 
 You'll also want to configure your setup with your client_id and client_key. Put this in the same file as above or in a separate initializer if you wish:
 
-    Txter.configure do |config|
+    TwilioContactable.configure do |config|
       # these two are required:
       # (replace them with your actual account info)
       config.client_id = 12345
@@ -91,13 +100,13 @@ Receiving Messages From 4info.com
 ====
 
 You can also receive data posted to you from 4info.com. This is how you'll receive messages and notices that users have been blocked.
-All you need is to create a bare controller and include Txter::Controller into it. Then specify which Ruby class you're using as a contactable user model (likely User)
+All you need is to create a bare controller and include TwilioContactable::Controller into it. Then specify which Ruby class you're using as a contactable user model (likely User)
 
 
     class SMSController < ApplicationController
-      include Txter::Controller
+      include TwilioContactable::Controller
 
-      sms_contactable User # or whichever class you included Txter::Contactable into
+      sms_contactable User # or whichever class you included TwilioContactable::Contactable into
     end
 
 And hook this up in your routes.rb file like so:
