@@ -24,7 +24,7 @@ class TwilioContactableControllerTest < ActionController::TestCase
   context "with a user" do
     setup {
       User.delete_all
-      @user = User.create! :sms_phone_number => '(206) 335-1596'
+      @user = User.create! :phone_number => '(206) 335-1596'
       # and we should be able to find @user by this formatted version
       @formatted_phone_number = "2063351596"
     }
@@ -36,10 +36,10 @@ class TwilioContactableControllerTest < ActionController::TestCase
       }
       should_respond_with :success
       should "block user" do
-        assert @user.reload.twilio_contactable_sms_blocked?
+        assert @user.reload.sms_blocked?
       end
       should_change "user block status" do
-        @user.reload.twilio_contactable_sms_blocked?
+        @user.reload.sms_blocked?
       end
     end
     context "receiving MESSAGE" do
@@ -55,20 +55,20 @@ class TwilioContactableControllerTest < ActionController::TestCase
         }
         should_respond_with :success
         should "not block user" do
-          assert !@user.reload.twilio_contactable_sms_blocked?
+          assert !@user.reload.sms_blocked?
         end
       end
       context "when the user is set up to receive" do
         setup {
           User.delete_all
-          @new_user = UserWithSMSReceiving.create!(:sms_phone_number => @user.sms_phone_number)
+          @new_user = UserWithSMSReceiving.create!(:phone_number => @user.phone_number)
           UserWithSMSReceiving.any_instance.expects(:receive_sms).with("This is a text message.").once
           post :index,
           @receive_params
         }
         should_respond_with :success
         should "not block user" do
-          assert !@new_user.reload.twilio_contactable_sms_blocked?
+          assert !@new_user.reload.sms_blocked?
         end
       end
     end

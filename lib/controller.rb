@@ -33,7 +33,7 @@ module TwilioContactable
         case request['type']
         when 'BLOCK'
           @contactable = find_contactable(request[:block][:recipient][:id])
-          @contactable.twilio_contactable_sms_blocked = true
+          @contactable._TC_sms_blocked = true
           @contactable.save!
         when 'MESSAGE'
           @contactable = find_contactable(request[:message][:sender][:id])
@@ -51,10 +51,11 @@ module TwilioContactable
           found = @@contactable_class.find(
             :first,
             :conditions => 
-              { @@contactable_class.sms_phone_number_column => possible_phone_number }
+              { @@contactable_class.twilio_contactable.formatted_phone_number_column => possible_phone_number }
           )
           return found if found
         end
+        nil
       # rescue => error
       #   render :text => error.inspect
       end

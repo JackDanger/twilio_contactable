@@ -21,12 +21,12 @@ module TwilioContactable
 
       def initialize
 
-        yield self
+        yield self if block_given?
 
         Attributes.each do |attr|
           # set the defaults if the user hasn't specified anything
-          if send(attr).blank?
-            send("#{attr}=", attr)
+          if send("#{attr}_column").blank?
+            send("#{attr}_column=", attr)
           end
         end
       end
@@ -38,7 +38,8 @@ module TwilioContactable
       # via this same 'twilio_contactable' method
       model.instance_eval do
         def twilio_contactable(&block)
-          @@twilio_contactable ||= Configuration.new(&block)
+          @@twilio_contactable = Configuration.new(&block) if block
+          @@twilio_contactable ||= Configuration.new
         end
       end
 
@@ -49,8 +50,8 @@ module TwilioContactable
         model.before_save :format_phone_number
         model.class_eval do
           def format_phone_number
-            twilio_contactable.formatted_phone_number =
-              TwilioContactable.numerize(twilio_contactable.phone_number)
+            self._TC_formatted_phone_number =
+              TwilioContactable.numerize(_TC_phone_number)
           end
         end
       end
@@ -58,13 +59,16 @@ module TwilioContactable
 
     # Set up a bridge to access the data for a specific instance
     # by referring to the column values in the configuration.
+    def twilio_contactable
+      self.class.twilio_contactable
+    end
     Attributes.each do |attr|
       eval %Q{
         def _TC_#{attr}
-          send self.class.twilio_contactable.#{attr}
+          read_attribute self.class.twilio_contactable.#{attr}_column
         end
         def _TC_#{attr}=(value)
-          send self.class.twilio_contactable.#{attr}.to_s + '=', value
+          write_attribute  self.class.twilio_contactable.#{attr}_column, value
         end
       }
     end
@@ -84,7 +88,7 @@ module TwilioContactable
 
       # split into pieces that fit as individual messages.
       msg.to_s.scan(/.{1,160}/m).map do |text|
-        if TwilioContactable.deliver(text, _TC_phone_number).success?
+        if TwilioContactable::Gateway.deliver(text, _TC_phone_number).success?
           text.size
         else
           false
@@ -110,7 +114,7 @@ module TwilioContactable
         raise ArgumentError, "SMS Confirmation Message is too long. Limit it to 160 characters of unescaped text."
       end
 
-      response = TwilioContactable.deliver(message, _TC_phone_number)
+      response = TwilioContactable::Gateway.deliver(message, _TC_phone_number)
 
       if response.success?
         update_twilio_contactable_sms_confirmation confirmation_code
@@ -124,15 +128,10 @@ module TwilioContactable
     # If request succeeds, changes the contactable record's
     # sms_blocked_column to false.
     def unblock_sms!
-      return false unless _TC_sms_blocked
+      return unless _TC_sms_blocked
 
-      response = TwilioContactable.unblock(_TC_phone_number)
-      if response.success?
-        self._TC_sms_blocked = false
-        save
-      else
-        false
-      end
+      self._TC_sms_blocked = false
+      save
     end
 
     # Compares user-provided code with the stored confirmation
@@ -141,7 +140,7 @@ module TwilioContactable
     def sms_confirm_with(code)
       if _TC_sms_confirmation_code.to_s.downcase == code.downcase
         # save the phone number into the 'confirmed phone number' attribute
-        _TC_sms_confirmed_phone_number = _TC_phone_number
+        self._TC_sms_confirmed_phone_number = _TC_phone_number
         save
       else
         false

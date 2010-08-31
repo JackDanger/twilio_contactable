@@ -1,5 +1,5 @@
 module TwilioContactable
-  class Gateway
+  module Gateway
     class Response
       def initialize(*args)
         @options = args.last
@@ -9,8 +9,8 @@ module TwilioContactable
         :success == @options[:status]
       end
     end
-    Success = TwilioContactable::Gateway::Response.new(:status => :success)
-    Error   = TwilioContactable::Gateway::Response.new(:status => :error)
+    Success = Response.new(:status => :success)
+    Error   = Response.new(:status => :error)
 
     API_VERSION   = '2008-08-01'
 
@@ -36,7 +36,8 @@ module TwilioContactable
              TwilioContactable.configuration.client_key.blank?
              raise "Add your Twilio account id (as client_id) and token (as client_key) to the TwilioContactable.configure block"
           end
-
+          gem 'twiliolib'
+          require 'twiliolib'
           Twilio::RestAccount.new(
                       TwilioContactable.configuration.client_id,
                       TwilioContactable.configuration.client_key

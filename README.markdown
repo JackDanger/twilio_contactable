@@ -139,7 +139,7 @@ Incoming messages from a user will automatically be sent to that user's record:
    # If "I love you!" is sent to you from a user with
    # the phone number "555-111-9999"
    # then the following will be executed:
-   User.find_by_sms_phone_number('5551119999').receive_sms("I love you!")
+   User.find_by_phone_number('5551119999').receive_sms("I love you!")
 
 It's up to you to implement the 'receive_sms' method on User.
 

@@ -1,12 +1,5 @@
 module TwilioContactable
   class << self
-    def gateway
-      TwilioContactable::Gateway.current
-    end
-
-    delegate :deliver, :to => :gateway
-    delegate :unblock, :to => :gateway
-
     def log(msg)
       if defined?(Rails)
         Rails.logger.info msg
