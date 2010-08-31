@@ -18,27 +18,34 @@ Setting Up Your Model
 Include Twilio::Contactable into your User class or whatever you're using to represent an entity with a phone number. 
 
     class User < ActiveRecord::Base
-      include TwilioContactable::Contactable
+      twilio_contactable
     end
 
 You can also specify which attributes you'd like to use instead of the defaults
 
     class User < ActiveRecord::Base
-      include TwilioContactable::Contactable
-
-      sms_phone_number_column            :mobile_number
-      sms_blocked_column                 :is_sms_blocked
-      sms_confirmation_code_column       :the_sms_confirmation_code
-      sms_confirmation_attempted_column  :when_was_the_sms_confirmation_attempted
-      sms_confirmed_phone_number_column  :the_mobile_number_thats_been_confirmed
+      twilio_contactable do |config|
+        config.phone_number_column                  :mobile_number
+        config.formatted_phone_number_column        :formatted_mobile_number
+        config.sms_blocked_column                   :should_we_not_txt_this_user
+        config.sms_confirmation_code_column         :the_sms_confirmation_code
+        config.sms_confirmation_attempted_column    :when_was_the_sms_confirmation_attempted
+        config.sms_confirmed_phone_number_column    :the_mobile_number_thats_been_confirmed_for_sms
+        config.voice_blocked_column                 :should_we_not_call_this_user
+        config.voice_confirmation_code_column       :the_voice_confirmation_code
+        config.voice_confirmation_attempted_column  :when_was_the_voice_confirmation_attempted
+        config.voice_confirmed_phone_number_column  :the_mobile_number_thats_been_confirmed_for_voice
 
       # Defaults to the name on the left (minus the '_column' at the end)
+      # e.g., the sms_blocked_column is 'sms_blocked'
+      #
+      # You don't need all those columns, omit any that you're sure you won't want.
     end
 
 Turning the thing on
 ---
 
-Because it can be expensive to send TXTs accidentally, it's required that you manually configure TwilioContactable in your app. Put this line in config/environments/production.rb or anything that loads _only_ in your production environment:
+Because it can be expensive to send TXTs or make calls accidentally, it's required that you manually configure TwilioContactable in your app. Put this line in config/environments/production.rb or anything that loads _only_ in your production environment:
 
     TwilioContactable.mode = :live
 
@@ -63,10 +70,11 @@ You'll also want to configure your setup with your client_id and client_key. Put
 Phone number formatting
 ---
 
-Whatever is stored in the sms_phone_number_column will be subject to normalized formatting:
+Whatever is stored in the phone_number_column will be subject to normalized formatting:
 
-    user = User.create :sms_phone_number => '(206) 555-1234'
-    user.sms_phone_number # => 2065551234
+    user = User.create :phone_number => '(206) 555-1234'
+    user.phone_number # => (206) 555-1234
+    user.formatted_phone_number # => 12065551234 (defaults to US country code)
 
 If you want to preserve the format of the number exactly as the user entered it you'll want
 to save that in a different attribute.
@@ -75,31 +83,36 @@ to save that in a different attribute.
 Confirming Phone Number And Sending Messages
 ====
 
-You can manage the user's SMS state like so:
+When your users first hand you their number it will be unconfirmed:
 
-    @user = User.create(:sms_phone_number => '5552223333')
-    @user.send_sms_confirmation!
-    @user.sms_confirmed? # => false
+    @user = User.create(:phone_number => '555-222-3333')
+    @user.send_sms_confirmation! # fires off a TXT to the user with a generated confirmation code
+    @user.sms_confirmed?         # => false, because we've only started the process
 
 then ask the user for the confirmation code off their phone and pass it in to sms_confirm_with:
 
-    @user.sms_confirm_with(user_provided_code)
+    @user.sms_confirm_with('123XYZ')
 
 If the code is right then the user's current phone number will be automatically marked as confirmed. You can check this at any time with:
 
     @user.sms_confirmed? # => true
     @user.send_sms!("Hi! This is a text message.")
 
-Then maybe the user will reply with 'BLOCK' by accident and @user.sms_blocked? will be true.
-You can fix this by calling:
+If the code is wrong then the user's current phone number will stay unconfirmed.
+
+    @user.sms_confirmed? # => false
+    @user.send_sms!("Hi! This is a text message.") # sends nothing
+
+Users might send a TXT to you asking to 'BLOCK' you so you stop txting them. @user.sms_blocked? will then be true (this happens in the controller module).
+You can reset this blocked status by calling:
 
     @user.unblock_sms!
 
 
-Receiving Messages From 4info.com
+Receiving TXTs and Voice calls
 ====
 
-You can also receive data posted to you from 4info.com. This is how you'll receive messages and notices that users have been blocked.
+You can also receive data posted to you from Twilio. This is how you'll receive messages, txts and notices that users have been blocked.
 All you need is to create a bare controller and include TwilioContactable::Controller into it. Then specify which Ruby class you're using as a contactable user model (likely User)
 
 
@@ -112,20 +125,23 @@ All you need is to create a bare controller and include TwilioContactable::Contr
 And hook this up in your routes.rb file like so:
 
     ActionController::Routing::Routes.draw do |map|
-      map.route '4info', :controller => 'twilio_contactable', :action => :index
+      map.route 'twilio', :controller => 'twilio_contactable', :action => :index
     end
 
-Now just tell 4info.com to POST messages and block notices to you at:
+Now just tell Twilio to POST messages and block notices to you at:
 
-    http://myrubyapp.com/4info
+    http://myrubyapp.com/twilio
 
-Now if your users reply to an SMS with 'STOP' your database will be updated to reflect this.
+Now if your users reply to an SMS with 'STOP' or 'BLOCK' your database will be automatically updated to reflect this.
 
 Incoming messages from a user will automatically be sent to that user's record:
 
-   # If "I love you!" is sent to you from a user with the phone
-   # number "555-111-9999" then the following will be executed:
+   # If "I love you!" is sent to you from a user with
+   # the phone number "555-111-9999"
+   # then the following will be executed:
    User.find_by_sms_phone_number('5551119999').receive_sms("I love you!")
+
+It's up to you to implement the 'receive_sms' method on User.
 
 That's it. Patches welcome, forks celebrated.
 
