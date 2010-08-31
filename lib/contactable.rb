@@ -103,7 +103,7 @@ module TwilioContactable
     end
 
 
-    # Sends an unblock request via xml to the 4info gateway.
+    # Sends an unblock request to Twilio.
     # If request succeeds, changes the contactable record's
     # sms_blocked_column to false.
     def unblock_sms!
