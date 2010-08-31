@@ -1,9 +1,7 @@
-4info
+Txter
 =====
 
-Connect to the 4info SMS gateway
-
-If you're using 4info.com as your SMS gateway this gem will give you a painless API for both sending and receiving messages.
+Send and receive TXT messages via either Twilio or (not recommended) 4info.com
 
 Setting Up Your Model
 =====

@@ -1,8 +1,5 @@
 module Txter
   class Gateway
-    class Request
-    end
-
     class Response
       def initialize(*args)
         @options = args.last
@@ -15,31 +12,45 @@ module Txter
     Success = Txter::Gateway::Response.new(:status => :success)
     Error   = Txter::Gateway::Response.new(:status => :error)
 
-    def self.deliver(*args)
-      # subclasses should actually do something here
-      Success 
-    end
+    API_VERSION   = '2008-08-01'
 
-    def self.unblock(*args)
-      # subclasses should actually do something here
-      Success 
-    end
+    class << self
 
-    def self.current
-      case Txter.configuration.gateway
-      when 'twilio'
-        gem 'twiliolib'
-        require 'twiliolib'
-        GatewayTwilio
-      when '4info'
-        Gateway4info
-      when 'test'
-        Txter::Gateway
-      else
-        raise "You need to specify your Txter gateway!"
+      def deliver(message, to, from = nil)
+
+        from ||= Txter.configuration.default_from_phone_number
+        raise "'From' number required for Twilio" unless from
+
+        response = post 'To'   => to,
+                       'From' => from,
+                       'Body' => message
+
+        Net::HTTPCreated == response.code_type ?
+                              Txter::Gateway::Success :
+                              Txter::Gateway::Error
       end
+
+      def account
+        @account ||= begin
+          if Txter.configuration.client_id.blank? ||
+             Txter.configuration.client_key.blank?
+             raise "Add your Twilio account id (as client_id) and token (as client_key) to the Txter.configure block"
+          end
+
+          Twilio::RestAccount.new(
+                      Txter.configuration.client_id,
+                      Txter.configuration.client_key
+                    )
+        end
+      end
+
+      protected
+
+        def post(data = {})
+          account.request "/#{API_VERSION}/Accounts/#{Txter.configuration.client_id}/SMS/Messages",
+                          "POST",
+                          data
+        end
     end
   end
 end
-require File.join(File.dirname(__FILE__), 'gateway_4info')
-require File.join(File.dirname(__FILE__), 'gateway_twilio')

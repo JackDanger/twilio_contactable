@@ -4,11 +4,11 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "txter"
-    gem.summary = %Q{Send and receive SMS messages simply via the Twilio gateway or the 4info.com gateway}
-    gem.description = %Q{Drop-in functionality to let Ruby apps send and receive TXT messages}
+    gem.name = "twilio_contactable"
+    gem.summary = %Q{Help authorize the users of your Rails apps to confirm and use their phone numbers}
+    gem.description = %Q{Does all the hard work with letting you confirm your user's phone numbers for Voice or TXT over the Twilio API}
     gem.email = "gitcommit@6brand.com"
-    gem.homepage = "http://github.com/JackDanger/txter"
+    gem.homepage = "http://github.com/JackDanger/twilio_contactable"
     gem.authors = ["Jack Danger Canty"]
     # gem.add_dependency "hpricot", ">= 0"
     # gem.add_dependency "haml", ">= 0"
@@ -22,7 +22,7 @@ rescue LoadError
 end
 
 require 'rake/testtask'
-desc "Test Txter"
+desc "Test Twilio Contactable"
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
   test.pattern = 'test/**/*_test.rb'
@@ -45,12 +45,3 @@ end
 task :test => :check_dependencies
 
 task :default => :test
-
-require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "inline_styles #{version}"
-  rdoc.rdoc_files.include('lib/**/*.rb')
-end

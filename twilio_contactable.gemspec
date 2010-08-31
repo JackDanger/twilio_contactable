@@ -4,13 +4,13 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{txter}
+  s.name = %q{twilio_contactable}
   s.version = "2.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jack Danger Canty"]
-  s.date = %q{2010-03-17}
-  s.description = %q{Drop-in functionality to let Ruby apps send and receive TXT messages}
+  s.date = %q{2010-08-30}
+  s.description = %q{Does all the hard work with letting you confirm your user's phone numbers for Voice or TXT over the Twilio API}
   s.email = %q{gitcommit@6brand.com}
   s.extra_rdoc_files = [
     "README.markdown"
@@ -21,16 +21,13 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "init.rb",
-     "lib/4info_templates/confirm.haml",
-     "lib/4info_templates/deliver.haml",
-     "lib/4info_templates/unblock.haml",
      "lib/configuration.rb",
      "lib/contactable.rb",
      "lib/controller.rb",
      "lib/gateway.rb",
      "lib/gateway_4info.rb",
      "lib/gateway_twilio.rb",
-     "lib/txter.rb",
+     "lib/twilio_contactable.rb",
      "test/.gitignore",
      "test/database.yml",
      "test/gateway_4info_test.rb",
@@ -38,14 +35,13 @@ Gem::Specification.new do |s|
      "test/test_helper.rb",
      "test/txter_contactable_test.rb",
      "test/txter_controller_test.rb",
-     "test/txter_module_test.rb",
-     "txter.gemspec"
+     "test/txter_module_test.rb"
   ]
-  s.homepage = %q{http://github.com/JackDanger/txter}
+  s.homepage = %q{http://github.com/JackDanger/twilio_contactable}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.5}
-  s.summary = %q{Send and receive SMS messages simply via the Twilio gateway or the 4info.com gateway}
+  s.rubygems_version = %q{1.3.7}
+  s.summary = %q{Help authorize the users of your Rails apps to confirm and use their phone numbers}
   s.test_files = [
     "test/gateway_4info_test.rb",
      "test/gateway_twilio_test.rb",
@@ -59,7 +55,7 @@ Gem::Specification.new do |s|
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<mocha>, [">= 0"])
     else
