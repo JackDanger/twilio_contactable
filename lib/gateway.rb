@@ -18,9 +18,13 @@ module TwilioContactable
 
       def initiate_voice_call(record, to, from = nil)
 
-        url = TwilioContactable.configuration.controller_url || 'twilio_contactable'
+        unless TwilioContactable.configuration.website_address
+          raise "Please define your `website_address` config parameter in the TwilioContactable initializer. It should be in the format of: \"http://example.com/\""
+        end
+
+        url = TwilioContactable.configuration.website_address.chomp('/')
+        url = "#{url}/#{record.class.twilio_contactable.controller}"
         url = "#{url}/start_voice_confirmation?contactable_type=#{record.class}&contactable_id=#{record.id}"
-        url = "/#{url}" unless url =~ /^\//
 
         deliver :voice,
                 'To' => to,

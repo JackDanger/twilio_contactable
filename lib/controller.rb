@@ -9,7 +9,7 @@ module TwilioContactable
         def twilio_contactable(*klasses)
           @@contactable_classes = klasses
           klasses.each do |klass|
-            klass.twilio_contactable.controller = self
+            klass.twilio_contactable.controller = self.class.name.underscore.chomp('_controller')
           end
         end
       end
@@ -32,7 +32,7 @@ module TwilioContactable
         if @contactable.respond_to?(:receive_sms)
           @contactable.receive_sms(request[:message][:text])
         else
-          warn "An SMS message was received but #{@@contactable_class.name.inspect} doesn't have a receive_sms method!"
+          warn "An SMS message was received but #{@contactable.class.name.inspect} doesn't have a receive_sms method!"
         end
       end
       render :text => 'OK', :status => 200

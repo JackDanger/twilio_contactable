@@ -27,7 +27,7 @@ module TwilioContactable
     attr_accessor :client_id
     attr_accessor :client_key
     attr_accessor :short_code
-    attr_accessor :controller_url
+    attr_accessor :website_address
     attr_accessor :default_from_phone_number
     attr_accessor :proxy_address
     attr_accessor :proxy_port

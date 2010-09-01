@@ -13,6 +13,7 @@ require File.join(File.dirname(__FILE__), "..", 'lib', 'twilio_contactable')
 TwilioContactable.configure do |config|
   config.client_id  = '1'
   config.client_key = 'ABCDEF'
+  config.website_address = 'http://example.com'
   config.default_from_phone_number = '1 (206) 867-5309'
 end
 

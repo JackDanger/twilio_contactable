@@ -18,6 +18,9 @@ module TwilioContactable
       Attributes.each do |attr|
         attr_accessor "#{attr}_column"
       end
+      # the following is set when a controller includes TwilioContactable
+      # and calls twilio_contactable with this model as an argument
+      attr_accessor :controller
 
       def initialize
 

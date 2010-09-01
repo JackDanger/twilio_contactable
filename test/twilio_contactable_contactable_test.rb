@@ -132,11 +132,6 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
         context "confirming phone number with a custom short code" do
           context "with expectations" do
             setup {
-              TwilioContactable.configure do |config|
-                config.short_code = '0005'
-                config.client_id  = 1
-                config.client_key = 'ABC123'
-              end
               message = "long message blah blah MYCODE blah"
               TwilioContactable.expects(:generate_confirmation_code).returns('MYCODE').once
               TwilioContactable.expects(:confirmation_message).returns(message).once
@@ -146,11 +141,6 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
           end
           context "(normal)" do
             setup {
-              TwilioContactable.configure do |config|
-                config.short_code = '0005'
-                config.client_id  = 1
-                config.client_key = 'ABC123'
-              end
               TwilioContactable::Gateway.stubs(:deliver).returns(Success)
               @worked = @user.send_sms_confirmation!
             }
@@ -251,11 +241,6 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
         context "confirming phone number with a custom short code" do
           context "with expectations" do
             setup {
-              TwilioContactable.configure do |config|
-                config.short_code = '0005'
-                config.client_id  = 1
-                config.client_key = 'ABC123'
-              end
               message = "long message blah blah MYCODE blah"
               TwilioContactable.expects(:generate_confirmation_code).returns('MYCODE').once
               TwilioContactable.expects(:confirmation_message).returns(message).once
@@ -265,11 +250,6 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
           end
           context "(normal)" do
             setup {
-              TwilioContactable.configure do |config|
-                config.short_code = '0005'
-                config.client_id  = 1
-                config.client_key = 'ABC123'
-              end
               TwilioContactable::Gateway.stubs(:deliver).returns(Success)
               @worked = @user.send_voice_confirmation!
             }

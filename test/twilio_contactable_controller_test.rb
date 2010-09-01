@@ -11,7 +11,7 @@ class TwilioContactableController < ActionController::Base
   twilio_contactable User
 end
 ActionController::Routing::Routes.draw do |map|
-  map.route '*:url', :controller => 'twilio_contactable', :action => :index
+  map.route ':controller/:action', :controller => 'twilio_contactable'
 end
 
 class UserWithSMSReceiving < User
@@ -30,7 +30,7 @@ class TwilioContactableControllerTest < ActionController::TestCase
     }
     context "receiving BLOCK" do
       setup {
-        post :index,
+        post :receive_sms_message,
         # this is what an xml request will parse to:
         "request"=>{"block"=>{"recipient"=>{"property"=>{"name"=>"CARRIER", "value"=>"3"}, "id"=>"+1#{@formatted_phone_number}", "type"=>"5"}}, "type" => "BLOCK"}
       }
@@ -50,8 +50,7 @@ class TwilioContactableControllerTest < ActionController::TestCase
       context "when the user is not set up to receive" do
         setup {
           @user.expects(:receive_sms).with("This is a text message.").never
-          post :index,
-          @receive_params
+          post :receive_sms_message, @receive_params
         }
         should_respond_with :success
         should "not block user" do
@@ -63,8 +62,7 @@ class TwilioContactableControllerTest < ActionController::TestCase
           User.delete_all
           @new_user = UserWithSMSReceiving.create!(:phone_number => @user.phone_number)
           UserWithSMSReceiving.any_instance.expects(:receive_sms).with("This is a text message.").once
-          post :index,
-          @receive_params
+          post :receive_sms_message, @receive_params
         }
         should_respond_with :success
         should "not block user" do
