@@ -16,18 +16,23 @@ module TwilioContactable
 
     class << self
 
-      def deliver(message, to, from = nil)
+      def initiate_voice_call(record, to, from = nil)
 
-        from ||= TwilioContactable.configuration.default_from_phone_number
-        raise "'From' number required for Twilio" unless from
+        url = TwilioContactable.configuration.controller_url || 'twilio_contactable'
+        url = "#{url}/start_voice_confirmation?contactable_type=#{record.class}&contactable_id=#{record.id}"
+        url = "/#{url}" unless url =~ /^\//
 
-        response = post 'To'   => to,
-                       'From' => from,
-                       'Body' => message
+        deliver :voice,
+                'To' => to,
+                'From' => from,
+                'Url' => url
+      end
 
-        Net::HTTPCreated == response.code_type ?
-                              TwilioContactable::Gateway::Success :
-                              TwilioContactable::Gateway::Error
+      def deliver_sms(message, to, from = nil)
+        deliver :sms,
+                'Message' => message,
+                'To' => to,
+                'From' => from
       end
 
       def account
@@ -47,8 +52,27 @@ module TwilioContactable
 
       protected
 
-        def post(data = {})
-          account.request "/#{API_VERSION}/Accounts/#{TwilioContactable.configuration.client_id}/SMS/Messages",
+        def deliver(type, data = {})
+
+          data['From'] = TwilioContactable.configuration.default_from_phone_number if data['From'].blank?
+          raise "'From' number required for Twilio" unless data['From']
+
+          service = case type
+          when :sms
+            'SMS/Messages'
+          when :voice
+            'Calls'
+          end
+
+          response = post service, data
+ 
+          Net::HTTPCreated == response.code_type ?
+                                TwilioContactable::Gateway::Success :
+                                TwilioContactable::Gateway::Error
+        end
+
+        def post(service, data = {})
+          account.request "/#{API_VERSION}/Accounts/#{TwilioContactable.configuration.client_id}/#{service}",
                           "POST",
                           data
         end

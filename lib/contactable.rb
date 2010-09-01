@@ -74,27 +74,6 @@ module TwilioContactable
     end
 
 
-    # Sends one or more TXT messages to the contactable record's
-    # mobile number (if the number has been confirmed).
-    # Any messages longer than 160 characters will need to be accompanied
-    # by a second argument <tt>true</tt> to clarify that sending
-    # multiple messages is intentional.
-    def send_sms!(msg, allow_multiple = false)
-      if msg.to_s.size > 160 && !allow_multiple
-        raise ArgumentError, "SMS Message is too long. Either specify that you want multiple messages or shorten the string."
-      end
-      return false if msg.to_s.strip.blank? || _TC_sms_blocked
-      return false unless sms_confirmed?
-
-      # split into pieces that fit as individual messages.
-      msg.to_s.scan(/.{1,160}/m).map do |text|
-        if TwilioContactable::Gateway.deliver(text, _TC_phone_number).success?
-          text.size
-        else
-          false
-        end
-      end
-    end
 
     # Sends an SMS validation request through the gateway
     def send_sms_confirmation!
@@ -123,15 +102,22 @@ module TwilioContactable
       end
     end
 
+    # Begins a phone call to the user where they'll need to type
+    # their confirmation code
+    def send_voice_confirmation!
+      return false if _TC_voice_blocked
+      return true  if voice_confirmed?
+      return false if _TC_phone_number.blank?
 
-    # Sends an unblock request to Twilio.
-    # If request succeeds, changes the contactable record's
-    # sms_blocked_column to false.
-    def unblock_sms!
-      return unless _TC_sms_blocked
+      confirmation_code = TwilioContactable.generate_confirmation_code
 
-      self._TC_sms_blocked = false
-      save
+      response = TwilioContactable::Gateway.initiate_voice_call(self, _TC_phone_number)
+
+      if response.success?
+        update_twilio_contactable_voice_confirmation confirmation_code
+      else
+        false
+      end
     end
 
     # Compares user-provided code with the stored confirmation
@@ -154,12 +140,61 @@ module TwilioContactable
       self._TC_sms_confirmed_phone_number == _TC_phone_number
     end
 
+    # Compares user-provided code with the stored confirmation
+    # code. If they match then the current phone number is set
+    # as confirmed by the user.
+    def voice_confirm_with(code)
+      if _TC_voice_confirmation_code.to_s.downcase == code.downcase
+        # save the phone number into the 'confirmed phone number' attribute
+        self._TC_voice_confirmed_phone_number = _TC_phone_number
+        save
+      else
+        false
+      end
+    end
+
+    # Returns true if the current phone number has been confirmed by
+    # the user by receiving a phone call
+    def voice_confirmed?
+      return false if _TC_voice_confirmed_phone_number.blank?
+      self._TC_voice_confirmed_phone_number == _TC_phone_number
+    end
+
+    # Sends one or more TXT messages to the contactable record's
+    # mobile number (if the number has been confirmed).
+    # Any messages longer than 160 characters will need to be accompanied
+    # by a second argument <tt>true</tt> to clarify that sending
+    # multiple messages is intentional.
+    def send_sms!(msg, allow_multiple = false)
+      if msg.to_s.size > 160 && !allow_multiple
+        raise ArgumentError, "SMS Message is too long. Either specify that you want multiple messages or shorten the string."
+      end
+      return false if msg.to_s.strip.blank? || _TC_sms_blocked
+      return false unless sms_confirmed?
+
+      # split into pieces that fit as individual messages.
+      msg.to_s.scan(/.{1,160}/m).map do |text|
+        if TwilioContactable::Gateway.deliver_sms(text, _TC_phone_number).success?
+          text.size
+        else
+          false
+        end
+      end
+    end
+
     protected
 
       def update_twilio_contactable_sms_confirmation(new_code)
         self._TC_sms_confirmation_code = new_code
         self._TC_sms_confirmation_attempted = Time.now.utc
         self._TC_sms_confirmed_phone_number = nil
+        save
+      end
+
+      def update_twilio_contactable_voice_confirmation(new_code)
+        self._TC_voice_confirmation_code = new_code
+        self._TC_voice_confirmation_attempted = Time.now.utc
+        self._TC_voice_confirmed_phone_number = nil
         save
       end
   end  

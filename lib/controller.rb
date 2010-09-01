@@ -4,7 +4,8 @@ module TwilioContactable
     def self.included(controller)
       controller.instance_eval do
         # the user should specify which class gets contacted
-        def sms_contactable(klass)
+        protected
+        def twilio_contactable(klass)
           @@contactable_class = klass
         end
       end
@@ -13,6 +14,24 @@ module TwilioContactable
     # the likely default
     def index
       recieve_xml
+    end
+
+    def start_voice_confirmation
+      render :xml => (Twilio::Response.new.tap do |response|
+        response.addGather(
+              :action => url_for(
+                :action => 'receive_voice_confirmation',
+                :contactable_type => params[:contactable_type],
+                :contactable_id   => params[:contactable_id]
+              )
+            ).tap do |gather|
+          gather.addSay "Please type the numbers that appear on your screen, followed by the pound sign"
+        end
+      end.respond)
+    end
+
+    def receive_voice_confirmation
+      
     end
 
     # in case this is hooked up as a RESTful route

@@ -103,11 +103,6 @@ If the code is wrong then the user's current phone number will stay unconfirmed.
     @user.sms_confirmed? # => false
     @user.send_sms!("Hi! This is a text message.") # sends nothing
 
-Users might send a TXT to you asking to 'BLOCK' you so you stop txting them. @user.sms_blocked? will then be true (this happens in the controller module).
-You can reset this blocked status by calling:
-
-    @user.unblock_sms!
-
 
 Receiving TXTs and Voice calls
 ====

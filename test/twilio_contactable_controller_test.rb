@@ -8,7 +8,7 @@ require 'shoulda/action_controller/matchers'
 class TwilioContactableController < ActionController::Base
   include TwilioContactable::Controller
 
-  sms_contactable User
+  twilio_contactable User
 end
 ActionController::Routing::Routes.draw do |map|
   map.route '*:url', :controller => 'twilio_contactable', :action => :index
