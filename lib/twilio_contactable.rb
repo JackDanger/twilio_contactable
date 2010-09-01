@@ -1,13 +1,5 @@
 module TwilioContactable
   class << self
-    def log(msg)
-      if defined?(Rails)
-        Rails.logger.info msg
-      else
-        STDOUT.puts msg
-      end
-    end
-
     def numerize(numberish)
       numberish.to_s.scan(/\d+/).join
     end
