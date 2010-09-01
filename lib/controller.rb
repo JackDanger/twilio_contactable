@@ -3,7 +3,8 @@ module TwilioContactable
 
     def self.included(controller)
       controller.instance_eval do
-        # the user should specify which class gets contacted
+        # the developer should specify which model will be sought
+        # when the app receives incoming requests
         protected
         def twilio_contactable(klass)
           @@contactable_class = klass
@@ -11,9 +12,27 @@ module TwilioContactable
       end
     end
 
-    # the likely default
-    def index
-      recieve_xml
+    def receive_sms_message
+      unless defined?(@@contactable_class)
+        raise RuntimeError, "Please define which model this controller should receive for via the 'twilio_contactable' method"
+      end
+
+      request = params[:request]
+      render :text => 'unknown format', :status => 500 and return unless request
+      case request['type']
+      when 'BLOCK'
+        @contactable = find_contactable(request[:block][:recipient][:id])
+        @contactable._TC_sms_blocked = true
+        @contactable.save!
+      when 'MESSAGE'
+        @contactable = find_contactable(request[:message][:sender][:id])
+        if @contactable.respond_to?(:receive_sms)
+          @contactable.receive_sms(request[:message][:text])
+        else
+          warn "An SMS message was received but #{@@contactable_class.name.inspect} doesn't have a receive_sms method!"
+        end
+      end
+      render :text => 'OK', :status => 200
     end
 
     def start_voice_confirmation
@@ -21,7 +40,6 @@ module TwilioContactable
         response.addGather(
               :action => url_for(
                 :action => 'receive_voice_confirmation',
-                :contactable_type => params[:contactable_type],
                 :contactable_id   => params[:contactable_id]
               )
             ).tap do |gather|
@@ -34,36 +52,7 @@ module TwilioContactable
       
     end
 
-    # in case this is hooked up as a RESTful route
-    def create
-      recieve_xml
-    end
-
     protected
-
-      def recieve_xml
-
-        unless defined?(@@contactable_class)
-          raise RuntimeError, "Please define your user class in the TwilioContactable controller via the 'sms_contactable' method"
-        end
-
-        request = params[:request]
-        render :text => 'unknown format', :status => 500 and return unless request
-        case request['type']
-        when 'BLOCK'
-          @contactable = find_contactable(request[:block][:recipient][:id])
-          @contactable._TC_sms_blocked = true
-          @contactable.save!
-        when 'MESSAGE'
-          @contactable = find_contactable(request[:message][:sender][:id])
-          if @contactable.respond_to?(:receive_sms)
-            @contactable.receive_sms(request[:message][:text])
-          else
-            warn "An SMS message was received but #{@@contactable_class.name.inspect} doesn't have a receive_sms method!"
-          end
-        end
-        render :text => 'OK', :status => 200
-      end
 
       def find_contactable(id)
         [id, id.sub(/^\+/,''), id.sub(/^\+1/,'')].uniq.compact.each do |possible_phone_number|

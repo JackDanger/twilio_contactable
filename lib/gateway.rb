@@ -12,7 +12,7 @@ module TwilioContactable
     Success = Response.new(:status => :success)
     Error   = Response.new(:status => :error)
 
-    API_VERSION   = '2008-08-01'
+    API_VERSION   = '2010-04-01'
 
     class << self
 
@@ -72,7 +72,10 @@ module TwilioContactable
         end
 
         def post(service, data = {})
-          account.request "/#{API_VERSION}/Accounts/#{TwilioContactable.configuration.client_id}/#{service}",
+          url = "/#{API_VERSION}/Accounts/#{TwilioContactable.configuration.client_id}/#{service}"
+          puts "putting data: #{data.inspect}"
+          puts "to url: #{url}"
+          account.request url,
                           "POST",
                           data
         end
