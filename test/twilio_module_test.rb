@@ -39,8 +39,8 @@ class TwilioContactableModuleTest < ActiveSupport::TestCase
 
   context "generating codes" do
     setup { @code = TwilioContactable.generate_confirmation_code }
-    should "be 6 digits" do
-      assert_equal 6, @code.length
+    should "be 4 digits" do
+      assert_equal 4, @code.length
     end
   end
 
