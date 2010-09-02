@@ -4,7 +4,8 @@ module TwilioContactable
     def self.included(controller)
       controller.instance_eval do
         # the developer should specify which model(s) will be sought
-        # when the app receives incoming requests
+        # when the app receives incoming requests.
+        # See the 'Controller' part of the README for details
         protected
         def twilio_contactable(*klasses)
           @@contactable_classes = klasses
@@ -55,6 +56,7 @@ module TwilioContactable
     def receive_voice_confirmation
       @contactable = params[:contactable_type].constantize.find(params[:contactable_id])
       @contactable.voice_confirm_with(params['Digits'])
+      render :xml => ''
     end
 
     protected
