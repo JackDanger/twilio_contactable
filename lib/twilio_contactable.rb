@@ -36,5 +36,3 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'configuration'))
 require File.expand_path(File.join(File.dirname(__FILE__), 'gateway'))
 require File.expand_path(File.join(File.dirname(__FILE__), 'contactable'))
 require File.expand_path(File.join(File.dirname(__FILE__), 'controller'))
-
-ActiveRecord::Base.send :include, TwilioContactable::Contactable

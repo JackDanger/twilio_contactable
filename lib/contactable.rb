@@ -68,10 +68,10 @@ module TwilioContactable
     Attributes.each do |attr|
       eval %Q{
         def _TC_#{attr}
-          read_attribute self.class.twilio_contactable.#{attr}_column
+          send self.class.twilio_contactable.#{attr}_column
         end
         def _TC_#{attr}=(value)
-          write_attribute  self.class.twilio_contactable.#{attr}_column, value
+          send self.class.twilio_contactable.#{attr}_column.to_s+'=', value
         end
       }
     end

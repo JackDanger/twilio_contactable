@@ -30,12 +30,19 @@ Connect This Code To Your App
 Include Twilio::Contactable into your User class or whatever you're using to represent an entity with a phone number. 
 
     class User < ActiveRecord::Base
+
+      include TwilioContactable::Contactable
+
       twilio_contactable
+
     end
 
 If you're using custom column names you can easily overwrite any of them:
 
     class User < ActiveRecord::Base
+
+      include TwilioContactable::Contactable
+
       twilio_contactable do |config|
         config.phone_number_column                  = :mobile_number
         config.formatted_phone_number_column        = :formatted_mobile_number
@@ -47,11 +54,11 @@ If you're using custom column names you can easily overwrite any of them:
         config.voice_confirmation_code_column       = :the_voice_confirmation_code
         config.voice_confirmation_attempted_column  = :when_was_the_voice_confirmation_attempted
         config.voice_confirmed_phone_number_column  = :the_mobile_number_thats_been_confirmed_for_voice
-
-      # Defaults to the name on the left (minus the '_column' at the end)
-      # e.g., the sms_blocked_column is 'sms_blocked'
-      #
-      # You don't need all those columns, omit any that you're sure you won't want.
+        # Defaults to the name on the left (minus the '_column' at the end)
+        # e.g., the sms_blocked_column is 'sms_blocked'
+        #
+        # You don't need all those columns, omit any that you're sure you won't want.
+      end
     end
 
 
