@@ -64,7 +64,7 @@ module TwilioContactable
     protected
 
       def gather(response)
-        (params[:tries] ||= '0').succ!
+        tries = (params[:tries] ||= '0').succ!
         if tries.to_i > 4
           response.addSay "We're sorry, this doesn't seem to be working. Please contact technical support."
           response.addHangup
