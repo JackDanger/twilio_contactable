@@ -88,6 +88,7 @@ module TwilioContactable
       return true  if sms_confirmed?
       return false if _TC_phone_number.blank?
 
+      format_phone_number
       confirmation_code = TwilioContactable.generate_confirmation_code
 
       # Use this class' confirmation_message method if it
@@ -116,6 +117,7 @@ module TwilioContactable
       return true  if voice_confirmed?
       return false if _TC_phone_number.blank?
 
+      format_phone_number
       confirmation_code = TwilioContactable.generate_confirmation_code
 
       response = TwilioContactable::Gateway.initiate_voice_call(self, _TC_formatted_phone_number)
