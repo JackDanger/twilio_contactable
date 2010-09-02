@@ -42,28 +42,45 @@ module TwilioContactable
 
     def start_voice_confirmation
       render :xml => (Twilio::Response.new.tap do |response|
-        response.addGather(
-              :action => url_for(
-                :action => 'receive_voice_confirmation',
-                :contactable_type => params[:contactable_type],
-                :contactable_id   => params[:contactable_id]
-              )
-            ).tap do |gather|
-          gather.addSay "Please type the numbers that appear on your screen, followed by the pound sign"
-        end
+        gather(response)
       end.respond)
     end
 
     def receive_voice_confirmation
       @contactable = params[:contactable_type].constantize.find(params[:contactable_id])
-      @contactable.voice_confirm_with(params['Digits'])
-      render :xml => (Twilio::Response.new.tap do |response|
-        response.addSay "Thank you, please return to the website and continue"
-        response.addHangup
-      end.respond)
+      if @contactable.voice_confirm_with(params['Digits'])
+        render :xml => (Twilio::Response.new.tap do |response|
+          response.addSay "Thank you, please return to the website and continue"
+          response.addHangup
+        end.respond)
+      else
+        render :xml => (Twilio::Response.new.tap do |response|
+          response.addSay "Sorry, those aren't the correct numbers."
+          gather(response)
+        end.respond)
+      end
     end
 
     protected
+
+      def gather(response)
+        (params[:tries] ||= '0').succ!
+        if tries.to_i > 4
+          response.addSay "We're sorry, this doesn't seem to be working. Please contact technical support."
+          response.addHangup
+        else
+          response.addGather(
+                :action => url_for(
+                  :action => 'receive_voice_confirmation',
+                  :contactable_type => params[:contactable_type],
+                  :contactable_id   => params[:contactable_id],
+                  :tries            => tries
+                )
+              ).tap do |gather|
+            gather.addSay "Please type the numbers that appear on your screen, followed by the pound sign"
+          end
+        end
+      end
 
       def find_contactable_by_phone_number(number)
         [number, number.sub(/^\+/,''), number.sub(/^\+1/,'')].uniq.compact.each do |possible_phone_number|
