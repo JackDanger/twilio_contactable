@@ -103,23 +103,6 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
               end
             end
           end
-          context "calling sms_confirm_with(right code, wrong case)" do
-            setup {
-              @downcased_code = @user._TC_sms_confirmation_code.downcase
-              @worked = @user.sms_confirm_with(@downcased_code)
-            }
-            should "have good test data" do
-              assert_not_equal @downcased_code,
-                               @user._TC_sms_confirmation_code
-            end
-            should "work" do
-              assert @worked
-            end
-            should "save the phone number into the confirmed attribute" do
-              assert_equal @user._TC_sms_confirmed_phone_number,
-                           @user._TC_formatted_phone_number
-            end
-          end
           context "calling sms_confirm_with(wrong_code)" do
             setup { @worked = @user.sms_confirm_with('wrong_code') }
             should "not work" do
@@ -218,23 +201,6 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
               should "un-confirm the record" do
                 assert !@user.voice_confirmed?
               end
-            end
-          end
-          context "calling voice_confirm_with(right code, wrong case)" do
-            setup {
-              @downcased_code = @user._TC_voice_confirmation_code.downcase
-              @worked = @user.voice_confirm_with(@downcased_code)
-            }
-            should "have good test data" do
-              assert_not_equal @downcased_code,
-                               @user._TC_voice_confirmation_code
-            end
-            should "work" do
-              assert @worked
-            end
-            should "save the phone number into the confirmed attribute" do
-              assert_equal @user._TC_voice_confirmed_phone_number,
-                           @user._TC_formatted_phone_number
             end
           end
           context "calling voice_confirm_with(wrong_code)" do

@@ -83,7 +83,7 @@ class TwilioContactableControllerTest < ActionController::TestCase
         assert_dom_equal %q{
           <response>
             <gather
-              action="http://test.host/twilio_contactable/receive_voice_confirmation?contactable_id=1&amp;contactable_type=User"
+              action="http://test.host/twilio_contactable/receive_voice_confirmation?contactable_id=1&amp;contactable_type=User&amp;tries=1"
               >
               <say>
                 Please type the numbers that appear on your screen, followed by the pound sign
