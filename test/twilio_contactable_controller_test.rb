@@ -93,5 +93,13 @@ class TwilioContactableControllerTest < ActionController::TestCase
       }, @response.body
       end
     end
+    context "receiving digits from Twilio" do
+      setup {
+        @receive_params = {"contactable_type"=>"User", "FromState"=>"WA", "Direction"=>"outbound-api", "CalledState"=>"WA", "ToState"=>"WA", "AccountSid"=>"ABCDEFG", "contactable_id"=>"1", "CallerCountry"=>"US", "CallerZip"=>"98077", "Caller"=>"{number}", "FromCity"=>"WOODINVILLE", "From"=>"{number}", "action"=>"receive_voice_confirmation", "CallerCity"=>"WOODINVILLE", "FromCountry"=>"US", "FromZip"=>"98077", "To"=>"+12069305710", "ToCity"=>"SEATTLE", "CallStatus"=>"in-progress", "controller"=>"twilio_contactable", "ToZip"=>"98188", "CalledZip"=>"98188", "CallerState"=>"WA", "Digits"=>"1234", "CalledCity"=>"SEATTLE", "Called"=>"+12069305710", "CalledCountry"=>"US", "CallSid"=>"ABCD", "ToCountry"=>"US", "ApiVersion"=>"2010-04-01"}
+        get :receive_voice_confirmation, @receive_params
+      }
+      should_respond_with :success
+      should_respond_with_content_type :xml
+    end
   end
 end
