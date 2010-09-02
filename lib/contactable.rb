@@ -114,7 +114,7 @@ module TwilioContactable
 
       confirmation_code = TwilioContactable.generate_confirmation_code
 
-      response = TwilioContactable::Gateway.initiate_voice_call(self, _TC_phone_number)
+      response = TwilioContactable::Gateway.initiate_voice_call(self, _TC_formatted_phone_number)
 
       if response.success?
         update_twilio_contactable_voice_confirmation confirmation_code
@@ -177,7 +177,7 @@ module TwilioContactable
 
       # split into pieces that fit as individual messages.
       msg.to_s.scan(/.{1,160}/m).map do |text|
-        if TwilioContactable::Gateway.deliver_sms(text, _TC_phone_number).success?
+        if TwilioContactable::Gateway.deliver_sms(text, _TC_formatted_phone_number).success?
           text.size
         else
           false
