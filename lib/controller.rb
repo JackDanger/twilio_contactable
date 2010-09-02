@@ -50,6 +50,8 @@ module TwilioContactable
             ).tap do |gather|
           gather.addSay "Please type the numbers that appear on your screen, followed by the pound sign"
         end
+        response.addSay "Thank you, please return to the website and continue"
+        response.addPause
       end.respond)
     end
 

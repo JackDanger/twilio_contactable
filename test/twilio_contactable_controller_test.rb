@@ -89,6 +89,10 @@ class TwilioContactableControllerTest < ActionController::TestCase
               Please type the numbers that appear on your screen, followed by the pound sign
             </say>
           </gather>
+          <say>
+            Thank you, please return to the website and continue
+          </say>
+          <pause></pause>
         </response>
       }, @response.body
       end
