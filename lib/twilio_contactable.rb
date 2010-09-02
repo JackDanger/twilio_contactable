@@ -29,6 +29,9 @@ module TwilioContactable
   end
 end
 
+gem 'twiliolib'
+require 'twiliolib'
+
 require File.join(File.dirname(__FILE__), 'configuration')
 require File.join(File.dirname(__FILE__), 'gateway')
 require File.join(File.dirname(__FILE__), 'contactable')
