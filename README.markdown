@@ -1,13 +1,13 @@
 Twilio Contactable
 =====
 
-Twilio makes voice and SMS interactions easy. But if you want to be able to seamlessly validate your user's phone numbers for
-both voice and text there's a lot of work you'll have to do in your Rails app. Unless you use this gem.
+Twilio makes voice and SMS interactions easy. But if you want to ensure that your user's phone numbers really belong
+to them there's a lot of buggy code you'll have to add in your Ruby app. Unless you use this gem.
 
 Don't Write Twilio Ruby Code Like It's PHP
 ==
 
-You don't want to be passing strings around and writing procedural code in your Ruby app. This gem lets you ask for a phone number from your users (or any ActiveRecord model), confirm their ownership of it via SMS or Voice or both, and keep track of whether the number is still validated whenever the number is edited.
+You don't want to be passing strings around between multiple web requests and writing procedural code in your Ruby app. Not for such a simple feature. This gem lets you ask for a phone number from your users (or any ActiveRecord-like Ruby class), confirm their ownership of it via SMS or Voice (or both), and automatically handle number invalidation.
 
 
 Install It
@@ -15,8 +15,14 @@ Install It
 
 Install TwilioContactable as a gem:
 
-    gem install twilio_contactable
-    # then add this gem to your project in .gems or in environment.rb
+    $ gem install twilio_contactable
+    
+    # For Rails add it in environment.rb:
+    config.gem 'twilio_contactable'
+
+    # then edit your .gems file or run
+    $ rake gems:unpack
+    # to unpack the gem into your vendor/gems directory
 
 Or as a Plugin:
 
@@ -27,7 +33,7 @@ Connect This Code To Your App
 ==
 
 
-Include Twilio::Contactable into your User class or whatever you're using to represent an entity with a phone number. 
+Include Twilio::Contactable into your User class or whatever you're using to represent an entity with a contactable phone number.
 
     class User < ActiveRecord::Base
 
@@ -37,7 +43,7 @@ Include Twilio::Contactable into your User class or whatever you're using to rep
 
     end
 
-If you're using custom column names you can easily overwrite any of them:
+If you're using custom column names you can easily overwrite any of them by passing in a configuration block:
 
     class User < ActiveRecord::Base
 
@@ -77,8 +83,8 @@ You'll need to add those columns to your database table using a migration that l
       t.string    :voice_confirmed_phone_number
     end
 
-You don't necessarily need all those columns though. Say you have users that are notified by SMS but business locations that
-just need to have their retail phone number validated:
+You don't necessarily need all those columns though. Say you have users that want to use SMS and business locations that
+just need to have their retail phone number to confirm their identity:
 
     change_table :users do |t|
       t.string    :phone_number
@@ -99,21 +105,23 @@ just need to have their retail phone number validated:
 
 Both the User and the BusinessLocation models are now prepared for SMS and Voice confirmation, respectively.
 
-You'll also need to create a controller that is capable of receiving connections from Twilio.com:
+You'll also need to create a controller that is capable of receiving connections from Twilio.com. You can reuse an existing controller or
+create a new one just for this task. TwilioContactable will guess the path from the controller name, so if you include it into a class called CheckPhoneNumbersController:
 
-    # app/controllers/twilio_contactable_controller.rb
-    class TwilioContactableController < ActionController::Base
+    # app/controllers/check_phone_numbers_controller.rb
+    class CheckPhoneNumbersController < ActionController::Base
       include TwilioContactable::Controller
 
       # any models that you want to have phone numbers confirmed for:
       twilio_contactable User, BusinessLocation
     end
 
+then Twilio.com would try to contact your site at '/check_phone_numbers'. As long as that route works then you don't need to configure anything else.
 
-Configure It With Twilio Account Info
+Configure It With Your Twilio Account Info
 ==
 
-Because it can be expensive to send TXTs or make calls accidentally, it's required that you manually configure TwilioContactable in your app. Put this line in config/environments/production.rb or anything that loads _only_ in your production environment:
+Because it can be expensive to send TXTs or make calls accidentally, it's required that you manually set TwilioContactable.mode in your app. Put this line in config/environments/production.rb or anything that loads _only_ in your production environment:
 
     TwilioContactable.mode = :live
 
