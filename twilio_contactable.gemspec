@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{twilio_contactable}
-  s.version = "0.7.1"
+  s.version = "0.7.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jack Danger Canty"]
@@ -37,7 +37,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/JackDanger/twilio_contactable}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.6}
+  s.rubygems_version = %q{1.3.7}
   s.summary = %q{Help authorize the users of your Rails apps to confirm and use their phone numbers}
   s.test_files = [
     "test/test_helper.rb",
@@ -50,7 +50,7 @@ Gem::Specification.new do |s|
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<twiliolib>, [">= 2.0.5"])
       s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<mocha>, [">= 0"])
