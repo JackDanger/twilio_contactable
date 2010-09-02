@@ -1,19 +1,31 @@
-Twilo Contactable
+Twilio Contactable
 =====
 
-Twilo makes voice and SMS interactions easy. But if you want to be able to seamlessly validate your user's phone numbers for
+Twilio makes voice and SMS interactions easy. But if you want to be able to seamlessly validate your user's phone numbers for
 both voice and text there's a lot of work you'll have to do in your Rails app. Unless you use this gem.
 
-Why bother?
-=====
+Don't Write Twilio Ruby Code Like It's PHP
+==
 
-Unless you're programming Ruby like it's PHP you don't enjoy passing strings around and writing all procedural code. This gem lets you
-ask for a phone number from your users, confirm their ownership of it via SMS or Voice or both, and keep track of whether the number is
-still validated when they edit it.
+You don't want to be passing strings around and writing procedural code in your Ruby app. This gem lets you ask for a phone number from your users (or any ActiveRecord model), confirm their ownership of it via SMS or Voice or both, and keep track of whether the number is still validated whenever the number is edited.
 
 
-Setting Up Your Model
-=====
+Install It
+==
+
+Install TwilioContactable as a gem:
+
+    gem install twilio_contactable
+    # then add this gem to your project in .gems or in environment.rb
+
+Or as a Plugin:
+
+    ruby script/plugin install git://github.com/JackDanger/twilio_contactable.git
+
+
+Connect This Code To Your App
+==
+
 
 Include Twilio::Contactable into your User class or whatever you're using to represent an entity with a phone number. 
 
@@ -21,20 +33,20 @@ Include Twilio::Contactable into your User class or whatever you're using to rep
       twilio_contactable
     end
 
-You can also specify which attributes you'd like to use instead of the defaults
+If you're using custom column names you can easily overwrite any of them:
 
     class User < ActiveRecord::Base
       twilio_contactable do |config|
-        config.phone_number_column                  :mobile_number
-        config.formatted_phone_number_column        :formatted_mobile_number
-        config.sms_blocked_column                   :should_we_not_txt_this_user
-        config.sms_confirmation_code_column         :the_sms_confirmation_code
-        config.sms_confirmation_attempted_column    :when_was_the_sms_confirmation_attempted
-        config.sms_confirmed_phone_number_column    :the_mobile_number_thats_been_confirmed_for_sms
-        config.voice_blocked_column                 :should_we_not_call_this_user
-        config.voice_confirmation_code_column       :the_voice_confirmation_code
-        config.voice_confirmation_attempted_column  :when_was_the_voice_confirmation_attempted
-        config.voice_confirmed_phone_number_column  :the_mobile_number_thats_been_confirmed_for_voice
+        config.phone_number_column                  = :mobile_number
+        config.formatted_phone_number_column        = :formatted_mobile_number
+        config.sms_blocked_column                   = :should_we_not_txt_this_user
+        config.sms_confirmation_code_column         = :the_sms_confirmation_code
+        config.sms_confirmation_attempted_column    = :when_was_the_sms_confirmation_attempted
+        config.sms_confirmed_phone_number_column    = :the_mobile_number_thats_been_confirmed_for_sms
+        config.voice_blocked_column                 = :should_we_not_call_this_user
+        config.voice_confirmation_code_column       = :the_voice_confirmation_code
+        config.voice_confirmation_attempted_column  = :when_was_the_voice_confirmation_attempted
+        config.voice_confirmed_phone_number_column  = :the_mobile_number_thats_been_confirmed_for_voice
 
       # Defaults to the name on the left (minus the '_column' at the end)
       # e.g., the sms_blocked_column is 'sms_blocked'
@@ -42,47 +54,84 @@ You can also specify which attributes you'd like to use instead of the defaults
       # You don't need all those columns, omit any that you're sure you won't want.
     end
 
-Turning the thing on
----
+
+You'll need to add those columns to your database table using a migration that looks something like this:
+
+    change_table :users do |t|
+      t.string    :phone_number
+      t.string    :formatted_phone_number
+      t.boolean   :sms_blocked, :default => false, :null => false
+      t.string    :sms_confirmation_code
+      t.datetime  :sms_confirmation_attempted
+      t.string    :sms_confirmed_phone_number
+      t.boolean   :voice_blocked, :default => false, :null => false
+      t.string    :voice_confirmation_code
+      t.datetime  :voice_confirmation_attempted
+      t.string    :voice_confirmed_phone_number
+    end
+
+You don't necessarily need all those columns though. Say you have users that are notified by SMS but business locations that
+just need to have their retail phone number validated:
+
+    change_table :users do |t|
+      t.string    :phone_number
+      t.string    :formatted_phone_number
+      t.boolean   :sms_blocked, :default => false, :null => false
+      t.string    :sms_confirmation_code
+      t.datetime  :sms_confirmation_attempted
+      t.string    :sms_confirmed_phone_number
+    end
+    change_table :business_locations do |t|
+      t.string    :phone_number
+      t.string    :formatted_phone_number
+      t.boolean   :voice_blocked, :default => false, :null => false
+      t.string    :voice_confirmation_code
+      t.datetime  :voice_confirmation_attempted
+      t.string    :voice_confirmed_phone_number
+    end
+
+Both the User and the BusinessLocation models are now prepared for SMS and Voice confirmation, respectively.
+
+You'll also need to create a controller that is capable of receiving connections from Twilio.com:
+
+    # app/controllers/twilio_contactable_controller.rb
+    class TwilioContactableController < ActionController::Base
+      include TwilioContactable::Controller
+
+      # any models that you want to have phone numbers confirmed for:
+      twilio_contactable User, BusinessLocation
+    end
+
+
+Configure It With Twilio Account Info
+==
 
 Because it can be expensive to send TXTs or make calls accidentally, it's required that you manually configure TwilioContactable in your app. Put this line in config/environments/production.rb or anything that loads _only_ in your production environment:
 
     TwilioContactable.mode = :live
 
-Skipping this step (or adding any other value) will prevent TXTs from actually being sent.
+Skipping this step (or adding any other value) will prevent TXTs or phone calls from actually being sent.
 
-You'll also want to configure your setup with your client_id and client_key. Put this in the same file as above or in a separate initializer if you wish:
+You'll need to add a few pieces of important information. Create a file like the following in config/initializers/
 
+    # config/initializers/twilio_contactable.rb
     TwilioContactable.configure do |config|
-      # these three are required:
-      # (replace them with your actual account info)
-      config.client_id = 12345
-      config.client_key = 'ABC123'
-      config.website_address = 'http://myrubyapp.com' # <- Twilio.com needs to be able to find this
 
-      # the rest are optional:
-      config.short_code     = 00001 # if you have a custom short code
-      config.proxy_address  = 'my.proxy.com'
-      config.proxy_port     = '80'
-      config.proxy_username = 'user'
-      config.proxy_password = 'password'
+      # Your Twilio Account Number
+      config.client_id  = 12345
+      # Your Twilio Account Secret Code
+      config.client_key = 'ABC123'
+      # Twilio.com needs to be able to find your site. Add your
+      # complete Ruby app internet address here:
+      config.website_address = 'http://myrubyapp.com'
+      # And, finally, the Twilio-hosted phone number
+      # that you'd like all your calls/txts to come from:
+      config.default_from_phone_number = '(206) 555-1234'
+
     end
 
-Phone number formatting
----
-
-Whatever is stored in the phone_number_column will be subject to normalized formatting:
-
-    user = User.create :phone_number => '(206) 555-1234'
-    user.phone_number # => (206) 555-1234
-    user.formatted_phone_number # => 12065551234 (defaults to US country code)
-
-If you want to preserve the format of the number exactly as the user entered it you'll want
-to save that in a different attribute.
-
-
-Confirming Phone Number And Sending Messages
-====
+Confirming Phone Number For SMS And Sending TXTs
+==
 
 When your users first hand you their number it will be unconfirmed:
 
@@ -90,11 +139,12 @@ When your users first hand you their number it will be unconfirmed:
     @user.send_sms_confirmation! # fires off a TXT to the user with a generated confirmation code
     @user.sms_confirmed?         # => false, because we've only started the process
 
-then ask the user for the confirmation code off their phone and pass it in to sms_confirm_with:
+The user will read the SMS confirmation code off of their phone and type it into a form on your site (you'll need to build this). When they submit that code to a controller you should pass it in to the user record's sms_confirm_with method:
 
-    @user.sms_confirm_with('123XYZ')
+    # params[:code] => '123XYZ'
+    @user.sms_confirm_with(params[:code])
 
-If the code is right then the user's current phone number will be automatically marked as confirmed. You can check this at any time with:
+If the code is correct then the user's current phone number will be automatically marked as confirmed. You can check this at any time with:
 
     @user.sms_confirmed? # => true
     @user.send_sms!("Hi! This is a text message.")
@@ -105,6 +155,27 @@ If the code is wrong then the user's current phone number will stay unconfirmed.
     @user.send_sms!("Hi! This is a text message.") # sends nothing
 
 
+Confirming Phone Number For Voice
+==
+
+Confirming for Voice is different from confirming for SMS because the user will read the code off your site and enter their Voice confirmation code into the keypad of their phone.
+
+    @user = User.create(:phone_number => '555-222-3333')
+    @user.send_voice_confirmation! # Initiates phone call to user
+    @user.voice_confirmed?         # false
+
+Right after send_voice_confirmation! is called you'll want to display the confirmation code to the user. It's up to you how to do this but you'll probably want to have a screen that shows something like this:
+
+    <h1>We're calling you on the phone right now!</h1>
+    <p>
+      When you answer the phone, please type in these numbers:
+      <%= @user.voice_confirmation_code %>
+    <p>
+    <%= link_to "Okay, I've finished the phone call", '/' %>
+
+While you display this screen the user will have inputted their voice_confirmation_code to their phone, Twilio.com will have posted that code to your server (defined in config.website_address), and your user will have been updated so that @user.voice_confirmed? is now true!
+If the code is entered incorrectly then the user's current phone number will stay unconfirmed. You'll need to start over and have them enter the code again.
+
 Receiving TXTs and Voice calls
 ====
 
@@ -112,30 +183,25 @@ You can also receive data posted to you from Twilio. This is how you'll receive 
 All you need is to create a bare controller and include TwilioContactable::Controller into it. Then specify which Ruby class you're using as a contactable user model (likely User)
 
 
-    class SMSController < ApplicationController
+    class TwilioContactableController < ApplicationController
+
       include TwilioContactable::Controller
 
-      sms_contactable User # or whichever class you included TwilioContactable::Contactable into
+      twilio_contactable User # or whichever class you included TwilioContactable::Contactable into
     end
 
-And hook this up in your routes.rb file like so:
+Make sure Twilio.com knows to POST all SMS messages and block notices to you at:
 
-    ActionController::Routing::Routes.draw do |map|
-      map.route 'twilio', :controller => 'twilio_contactable', :action => :index
-    end
+    http://myrubyapp.com/twilio_contactable/receive_sms_message
 
-Now just tell Twilio to POST messages and block notices to you at:
+This gem will handle all those incoming messages automatically. Now if your users reply to an SMS with 'STOP' or 'BLOCK' the appropriate record in your database will be updated so that sms messages no longer can be sent to them (i.e.: @user.sms_blocked? will be true)
 
-    http://myrubyapp.com/twilio
-
-Now if your users reply to an SMS with 'STOP' or 'BLOCK' your database will be automatically updated to reflect this.
-
-Incoming messages from a user will automatically be sent to that user's record:
+All other incoming TXTs (besides 'BLOCK' and 'STOP') from a user will automatically be sent to that user's record:
 
    # If "I love you!" is sent to you from a user with
    # the phone number "555-111-9999"
    # then the following will be executed:
-   User.find_by_phone_number('5551119999').receive_sms("I love you!")
+   User.find_by_formatted_phone_number('+15551119999').receive_sms("I love you!")
 
 It's up to you to implement the 'receive_sms' method on User.
 
