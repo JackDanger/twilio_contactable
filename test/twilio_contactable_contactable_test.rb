@@ -77,7 +77,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
               assert @worked
             end
             should "save the phone number into the confirmed attribute" do
-              assert_equal @user._TC_phone_number,
+              assert_equal @user._TC_formatted_phone_number,
                            @user._TC_sms_confirmed_phone_number,
                            @user.reload.inspect
             end
@@ -87,6 +87,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             context "and then attempting to confirm another number" do
               setup {
                 @user._TC_phone_number = "206-555-8990"
+                @user.save
                 TwilioContactable::Gateway.stubs(:deliver).returns(Success).once
                 @user.send_sms_confirmation!
               }
@@ -112,7 +113,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             end
             should "save the phone number into the confirmed attribute" do
               assert_equal @user._TC_sms_confirmed_phone_number,
-                           @user._TC_phone_number
+                           @user._TC_formatted_phone_number
             end
           end
           context "calling sms_confirm_with(wrong_code)" do
@@ -122,7 +123,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             end
             should "not save the phone number into the confirmed attribute" do
               assert_not_equal @user._TC_sms_confirmed_phone_number,
-                               @user._TC_phone_number
+                               @user._TC_formatted_phone_number
             end
             should_not_change "confirmed phone number attribute" do
               @user.reload._TC_sms_confirmed_phone_number
@@ -135,7 +136,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
               message = "long message blah blah MYCODE blah"
               TwilioContactable.expects(:generate_confirmation_code).returns('MYCODE').once
               TwilioContactable.expects(:confirmation_message).returns(message).once
-              TwilioContactable::Gateway.expects(:deliver).with(message, @user._TC_phone_number).once
+              TwilioContactable::Gateway.expects(:deliver).with(message, @user._TC_formatted_phone_number).once
               @user.send_sms_confirmation!
             }
           end
@@ -193,7 +194,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
               assert @worked
             end
             should "save the phone number into the confirmed attribute" do
-              assert_equal @user._TC_phone_number,
+              assert_equal @user._TC_formatted_phone_number,
                            @user._TC_voice_confirmed_phone_number,
                            @user.reload.inspect
             end
@@ -203,6 +204,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             context "and then attempting to confirm another number" do
               setup {
                 @user._TC_phone_number = "206-555-8990"
+                @user.save
                 TwilioContactable::Gateway.stubs(:deliver).returns(Success).once
                 @user.send_voice_confirmation!
               }
@@ -228,7 +230,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             end
             should "save the phone number into the confirmed attribute" do
               assert_equal @user._TC_voice_confirmed_phone_number,
-                           @user._TC_phone_number
+                           @user._TC_formatted_phone_number
             end
           end
           context "calling voice_confirm_with(wrong_code)" do
@@ -238,7 +240,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             end
             should "not save the phone number into the confirmed attribute" do
               assert_not_equal @user._TC_voice_confirmed_phone_number,
-                               @user._TC_phone_number
+                               @user._TC_formatted_phone_number
             end
             should_not_change "confirmed phone number attribute" do
               @user.reload._TC_voice_confirmed_phone_number
