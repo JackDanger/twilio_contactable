@@ -211,11 +211,8 @@ Make sure Twilio.com knows to POST all SMS messages and block notices to you at:
 
 This gem will handle all those incoming messages automatically. Now if your users reply to an SMS with 'STOP' or 'BLOCK' the appropriate record in your database will be updated so that sms messages no longer can be sent to them (i.e.: @user.sms_blocked? will be true)
 
-All other incoming TXTs (besides 'BLOCK' and 'STOP') from a user will automatically be sent to that user's record:
+All other incoming TXTs (besides 'BLOCK' and 'STOP') from a user will automatically be sent to that user's record. If "I love you!" is sent to you from a user with the phone number "555-111-9999" then the following will be executed:
 
-    # If "I love you!" is sent to you from a user with
-    # the phone number "555-111-9999"
-    # then the following will be executed:
     User.find_by_formatted_phone_number('+15551119999').receive_sms("I love you!")
 
 It's up to you to implement the 'receive_sms' method on User.
