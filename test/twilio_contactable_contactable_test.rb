@@ -165,6 +165,13 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
         context "via voice" do
           setup {
             TwilioContactable::Gateway.stubs(:deliver).returns(Success)
+            # To start any voice call we'll need to first initialize
+            # this model in a controller
+            class TestController < ActionController::Base
+              include TwilioContactable::Controller
+              twilio_contactable User
+              self
+            end
             @worked = @user.send_voice_confirmation!
           }
           should "work" do assert @worked end
@@ -236,39 +243,6 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             should_not_change "confirmed phone number attribute" do
               @user.reload._TC_voice_confirmed_phone_number
             end
-          end
-        end
-        context "confirming phone number with a custom short code" do
-          context "with expectations" do
-            setup {
-              message = "long message blah blah MYCODE blah"
-              TwilioContactable.expects(:generate_confirmation_code).returns('MYCODE').once
-              TwilioContactable.expects(:confirmation_message).returns(message).once
-              TwilioContactable::Gateway.expects(:deliver).with(message, @user._TC_phone_number).once
-              @user.send_voice_confirmation!
-            }
-          end
-          context "(normal)" do
-            setup {
-              TwilioContactable::Gateway.stubs(:deliver).returns(Success)
-              @worked = @user.send_voice_confirmation!
-            }
-            should "work" do
-              assert @worked
-            end
-          end
-        end
-        context "confirming phone number when the confirmation fails for some reason" do
-          setup {
-            TwilioContactable::Gateway.stubs(:deliver).returns(Error)
-            @worked = @user.send_voice_confirmation!
-          }
-          should "not work" do assert !@worked end
-          should "not save confirmation number" do
-            assert @user._TC_voice_confirmation_code.blank?
-          end
-          should_not_change "stored code" do
-            @user._TC_voice_confirmation_code
           end
         end
       end
