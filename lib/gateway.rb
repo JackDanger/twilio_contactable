@@ -1,5 +1,21 @@
 module TwilioContactable
   module Gateway
+    class WebsiteAddressNotConfiguredError < ArgumentError
+      def initialize
+        super "Please define your `website_address` config parameter "+
+              "in the TwilioContactable initializer. "+
+              "It should be in the format of: \"http://example.com/\""
+
+      end
+    end
+    class ControllerNotConfiguredError < ArgumentError
+      def initialize(record)
+        super "You're initiating a voice call for a "+
+              record.class.name.inspect +
+              " but you have not specified this class "+
+              "as a possible recipient in a controller."
+      end
+    end
     class Response
       def initialize(*args)
         @options = args.last
@@ -19,7 +35,10 @@ module TwilioContactable
       def initiate_voice_call(record, to, from = nil)
 
         unless TwilioContactable.configuration.website_address
-          raise "Please define your `website_address` config parameter in the TwilioContactable initializer. It should be in the format of: \"http://example.com/\""
+          raise WebsiteAddressNotConfiguredError.new
+        end
+        unless controller = record.class.twilio_contactable.controller
+          raise ControllerNotConfiguredError.new(record)
         end
 
         url = TwilioContactable.configuration.website_address.chomp('/')
@@ -45,8 +64,6 @@ module TwilioContactable
              TwilioContactable.configuration.client_key.blank?
              raise "Add your Twilio account id (as client_id) and token (as client_key) to the TwilioContactable.configure block"
           end
-          gem 'twiliolib'
-          require 'twiliolib'
           Twilio::RestAccount.new(
                       TwilioContactable.configuration.client_id,
                       TwilioContactable.configuration.client_key
