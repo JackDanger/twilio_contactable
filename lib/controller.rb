@@ -9,8 +9,9 @@ module TwilioContactable
         protected
         def twilio_contactable(*klasses)
           @@contactable_classes = klasses
+          name = self.name.underscore.chomp('_controller')
           klasses.each do |klass|
-            klass.twilio_contactable.controller = self.class.name.underscore.chomp('_controller')
+            klass.twilio_contactable.controller = name
           end
         end
       end
