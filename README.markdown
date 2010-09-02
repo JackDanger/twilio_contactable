@@ -213,10 +213,10 @@ This gem will handle all those incoming messages automatically. Now if your user
 
 All other incoming TXTs (besides 'BLOCK' and 'STOP') from a user will automatically be sent to that user's record:
 
-   # If "I love you!" is sent to you from a user with
-   # the phone number "555-111-9999"
-   # then the following will be executed:
-   User.find_by_formatted_phone_number('+15551119999').receive_sms("I love you!")
+    # If "I love you!" is sent to you from a user with
+    # the phone number "555-111-9999"
+    # then the following will be executed:
+    User.find_by_formatted_phone_number('+15551119999').receive_sms("I love you!")
 
 It's up to you to implement the 'receive_sms' method on User.
 
