@@ -129,7 +129,7 @@ module TwilioContactable
     def sms_confirm_with(code)
       if _TC_sms_confirmation_code.to_s.downcase == code.downcase
         # save the phone number into the 'confirmed phone number' attribute
-        self._TC_sms_confirmed_phone_number = _TC_phone_number
+        self._TC_sms_confirmed_phone_number = _TC_formatted_phone_number
         save
       else
         false
@@ -140,7 +140,7 @@ module TwilioContactable
     # the user for recieving TXT messages.
     def sms_confirmed?
       return false if _TC_sms_confirmed_phone_number.blank?
-      self._TC_sms_confirmed_phone_number == _TC_phone_number
+      self._TC_sms_confirmed_phone_number == _TC_formatted_phone_number
     end
 
     # Compares user-provided code with the stored confirmation
@@ -149,7 +149,7 @@ module TwilioContactable
     def voice_confirm_with(code)
       if _TC_voice_confirmation_code.to_s.downcase == code.downcase
         # save the phone number into the 'confirmed phone number' attribute
-        self._TC_voice_confirmed_phone_number = _TC_phone_number
+        self._TC_voice_confirmed_phone_number = _TC_formatted_phone_number
         save
       else
         false
@@ -160,7 +160,7 @@ module TwilioContactable
     # the user by receiving a phone call
     def voice_confirmed?
       return false if _TC_voice_confirmed_phone_number.blank?
-      self._TC_voice_confirmed_phone_number == _TC_phone_number
+      self._TC_voice_confirmed_phone_number == _TC_formatted_phone_number
     end
 
     # Sends one or more TXT messages to the contactable record's
