@@ -1,16 +1,16 @@
-require File.join(File.dirname(__FILE__), 'test_helper')
-require 'action_pack'
-require 'action_controller'
-require 'shoulda/action_controller'
-require 'shoulda/action_controller/macros'
-require 'shoulda/action_controller/matchers'
+require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 class TwilioContactableController < ActionController::Base
   include TwilioContactable::Controller
 
   twilio_contactable User
 end
-ActionController::Routing::Routes.draw do |map|
+
+begin
+  ActionController::Routing::Routes
+rescue
+  Rails.application.routes
+end.draw do |map|
   map.route ':controller/:action', :controller => 'twilio_contactable'
 end
 
