@@ -53,7 +53,7 @@ module TwilioContactable
 
       def deliver_sms(message, to, from = nil)
         deliver :sms,
-                'Message' => message,
+                'Body' => message,
                 'To' => to,
                 'From' => from
       end
@@ -85,17 +85,11 @@ module TwilioContactable
             'Calls'
           end
 
-          response = post service, data
- 
-          Net::HTTPCreated == response.code_type ?
-                                TwilioContactable::Gateway::Success :
-                                TwilioContactable::Gateway::Error
+          post service, data
         end
 
         def post(service, data = {})
           url = "/#{API_VERSION}/Accounts/#{TwilioContactable.configuration.client_id}/#{service}"
-          puts "putting data: #{data.inspect}"
-          puts "to url: #{url}"
           account.request url,
                           "POST",
                           data
