@@ -11,7 +11,6 @@ begin
     gem.homepage = "http://github.com/JackDanger/twilio_contactable"
     gem.authors = ["Jack Danger Canty"]
     gem.add_dependency "twiliolib", ">= 2.0.5"
-    gem.add_development_dependency "twiliolib", ">= 2.0.5"
     gem.add_development_dependency "shoulda", ">= 0"
     gem.add_development_dependency "mocha", ">= 0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
