@@ -81,20 +81,16 @@ class TwilioContactableControllerTest < ActionController::TestCase
       should_respond_with_content_type :xml
       should "render Gather TwiML node with a Say inside" do
         assert_dom_equal %q{
-        <response>
-          <gather
-            action="http://test.host/twilio_contactable/receive_voice_confirmation?contactable_id=1&amp;contactable_type=User"
-            >
-            <say>
-              Please type the numbers that appear on your screen, followed by the pound sign
-            </say>
-          </gather>
-          <say>
-            Thank you, please return to the website and continue
-          </say>
-          <pause></pause>
-        </response>
-      }, @response.body
+          <response>
+            <gather
+              action="http://test.host/twilio_contactable/receive_voice_confirmation?contactable_id=1&amp;contactable_type=User"
+              >
+              <say>
+                Please type the numbers that appear on your screen, followed by the pound sign
+              </say>
+            </gather>
+          </response>},
+        @response.body
       end
     end
     context "receiving digits from Twilio" do
@@ -112,6 +108,16 @@ class TwilioContactableControllerTest < ActionController::TestCase
       end
       should "not change the user's sms confirmation setting" do
         assert !@user.sms_confirmed?
+      end
+      should "render message in TwiML and hang up" do
+        assert_dom_equal %q{
+          <response>
+            <say>
+              Thank you, please return to the website and continue
+            </say>
+            <hangup></hangup>
+          </response>},
+          @response.body
       end
     end
   end

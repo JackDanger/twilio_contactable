@@ -50,15 +50,16 @@ module TwilioContactable
             ).tap do |gather|
           gather.addSay "Please type the numbers that appear on your screen, followed by the pound sign"
         end
-        response.addSay "Thank you, please return to the website and continue"
-        response.addPause
       end.respond)
     end
 
     def receive_voice_confirmation
       @contactable = params[:contactable_type].constantize.find(params[:contactable_id])
       @contactable.voice_confirm_with(params['Digits'])
-      render :xml => ''
+      render :xml => (Twilio::Response.new.tap do |response|
+        response.addSay "Thank you, please return to the website and continue"
+        response.addHangup
+      end.respond)
     end
 
     protected
