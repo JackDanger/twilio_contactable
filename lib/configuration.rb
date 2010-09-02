@@ -14,11 +14,11 @@ module TwilioContactable
     end
 
     def configuration
-      @@configuration ||= Configuration.new
+      @configuration ||= Configuration.new
     end
 
     def configure(&block)
-      @@configuration = Configuration.new(&block)
+      @configuration = Configuration.new(&block)
     end
   end
 

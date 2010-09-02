@@ -39,10 +39,10 @@ module TwilioContactable
 
       # set up the configuration, available within the class object
       # via this same 'twilio_contactable' method
-      model.instance_eval do
+      class << model
         def twilio_contactable(&block)
-          @@twilio_contactable = Configuration.new(&block) if block
-          @@twilio_contactable ||= Configuration.new
+          @twilio_contactable = Configuration.new(&block) if block
+          @twilio_contactable ||= Configuration.new
         end
       end
 

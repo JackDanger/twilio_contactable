@@ -2,7 +2,7 @@ module TwilioContactable
   module Controller
 
     def self.included(controller)
-      controller.instance_eval do
+      class << controller
         # the developer should specify which model(s) will be sought
         # when the app receives incoming requests.
         # See the 'Controller' part of the README for details

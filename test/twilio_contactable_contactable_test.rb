@@ -8,10 +8,14 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
   context "configuration" do
     TwilioContactable::Contactable::Attributes.each do |attr|
       context "attribute: #{attr}" do
-        should "begin with appropriate default for #{attr}_column and allow overwriting" do
+        should "begin with appropriate default for #{attr}_column" do
           klass = Class.new
           klass.send :include, TwilioContactable::Contactable
           assert_equal attr, klass.twilio_contactable.send("#{attr}_column")
+        end
+        should "allow overwriting the default" do
+          klass = Class.new
+          klass.send :include, TwilioContactable::Contactable
           klass.twilio_contactable do |config|
             config.send("#{attr}_column=", :custom_column)
           end
