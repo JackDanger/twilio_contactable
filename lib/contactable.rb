@@ -127,6 +127,7 @@ module TwilioContactable
     # code. If they match then the current phone number is set
     # as confirmed by the user.
     def sms_confirm_with(code)
+      check_for_twilio_contactable_columns(:sms)
       if _TC_sms_confirmation_code.to_s.downcase == code.downcase
         # save the phone number into the 'confirmed phone number' attribute
         self._TC_sms_confirmed_phone_number = _TC_formatted_phone_number
@@ -139,6 +140,7 @@ module TwilioContactable
     # Returns true if the current phone number has been confirmed by
     # the user for recieving TXT messages.
     def sms_confirmed?
+      check_for_twilio_contactable_columns(:sms)
       return false if _TC_sms_confirmed_phone_number.blank?
       self._TC_sms_confirmed_phone_number == _TC_formatted_phone_number
     end
@@ -147,6 +149,7 @@ module TwilioContactable
     # code. If they match then the current phone number is set
     # as confirmed by the user.
     def voice_confirm_with(code)
+      check_for_twilio_contactable_columns(:voice)
       if _TC_voice_confirmation_code.to_s.downcase == code.downcase
         # save the phone number into the 'confirmed phone number' attribute
         self._TC_voice_confirmed_phone_number = _TC_formatted_phone_number
@@ -159,6 +162,7 @@ module TwilioContactable
     # Returns true if the current phone number has been confirmed by
     # the user by receiving a phone call
     def voice_confirmed?
+      check_for_twilio_contactable_columns(:voice)
       return false if _TC_voice_confirmed_phone_number.blank?
       self._TC_voice_confirmed_phone_number == _TC_formatted_phone_number
     end
@@ -186,6 +190,16 @@ module TwilioContactable
     end
 
     protected
+
+      def check_for_twilio_contactable_columns(type)
+        columns_to_check_for = ["#{type}_confirmed_phone_number",
+                                "#{type}_confirmation_attempted",
+                                "#{type}_confirmation_code"]
+        return if self.class.columns.select do |column|
+          columns_to_check_for.include? column.name.to_s
+        end.size == columns_to_check_for.size
+        warn "TwilioContactable #{type.to_s.inspect} confirmation columns have not been added to #{self.class.name.inspect}"
+      end
 
       def update_twilio_contactable_sms_confirmation(new_code)
         self._TC_sms_confirmation_code = new_code
