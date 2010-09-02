@@ -23,8 +23,8 @@ module TwilioContactable
     end
 
     def generate_confirmation_code
-      chars = (0..9).to_a + ('A'..'Z').to_a
-      (0...6).collect { chars[Kernel.rand(chars.length)] }.join
+      nums = (0..9).to_a
+      (0...4).collect { nums[Kernel.rand(nums.length)] }.join
     end
   end
 end
