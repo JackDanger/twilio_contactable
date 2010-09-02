@@ -85,7 +85,11 @@ module TwilioContactable
             'Calls'
           end
 
-          post service, data
+          response = post service, data
+ 
+          Net::HTTPCreated == response.code_type ?
+                                TwilioContactable::Gateway::Success :
+                                TwilioContactable::Gateway::Error
         end
 
         def post(service, data = {})
