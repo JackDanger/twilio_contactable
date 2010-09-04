@@ -9,10 +9,8 @@ module TwilioContactable
       case number.size
       when 10
         "+1#{number}"
-      when 11
+      when 11,12
         "+#{number}"
-      when 12
-        number =~ /\+\d(11)/ ? number : nil
       else
         nil
       end

@@ -79,7 +79,7 @@ module TwilioContactable
 
     def has_valid_phone_number?
       format_phone_number
-      _TC_formatted_phone_number =~ /^\+[\d]{11,12}$/
+      _TC_formatted_phone_number =~ /^\+[\d]{10,12}$/
     end
 
     # Sends an SMS validation request through the gateway

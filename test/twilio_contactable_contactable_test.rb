@@ -34,6 +34,40 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
     should "normalize phone number" do
       assert_equal '+15551234567', @user.formatted_phone_number
     end
+    context "has_valid_phone_number?" do
+      context "with a two-digit country code" do
+        setup {
+          @user.update_attribute :phone_number, '+11 (222) 333-7777'
+        }
+        should "be valid" do
+          assert @user.has_valid_phone_number?
+        end
+      end
+      context "with a one-digit country code" do
+        setup {
+          @user.update_attribute :phone_number, '+1 (222) 333-7777'
+        }
+        should "be valid" do
+          assert @user.has_valid_phone_number?
+        end
+      end
+      context "with no country code" do
+        setup {
+          @user.update_attribute :phone_number, '(222) 333-7777'
+        }
+        should "be valid" do
+          assert @user.has_valid_phone_number?
+        end
+      end
+      context "with no area code" do
+        setup {
+          @user.update_attribute :phone_number, '333-7777'
+        }
+        should "not be valid" do
+          assert !@user.has_valid_phone_number?
+        end
+      end
+    end
     context "when phone number is blank" do
       setup { @user._TC_phone_number = nil}
       context "confirming phone number" do
