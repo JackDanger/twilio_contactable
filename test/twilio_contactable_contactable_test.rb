@@ -98,7 +98,8 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
           }
           should "work" do assert @worked end
           should "save confirmation number in proper attribute" do
-            assert @user._TC_sms_confirmation_code
+            assert @user._TC_sms_confirmation_code.length ==
+                    TwilioContactable::CONFIRMATION_CODE_LENGTH
           end
           should "set confirmation attempted time" do
             assert @user._TC_sms_confirmation_attempted > 3.minutes.ago

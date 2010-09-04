@@ -1,4 +1,5 @@
 module TwilioContactable
+  CONFIRMATION_CODE_LENGTH = 4
   class << self
     def numerize(numberish)
       numberish.to_s.scan(/\d+/).join
@@ -20,9 +21,20 @@ module TwilioContactable
       "Code: #{confirmation_code} Enter code on web to verify phone. Msg&data rates may apply. Freq set by u. T&C & support on web site. Txt HELP for help"
     end
 
+    def confirmation_code(record, type)
+      attempted = record.send("_TC_#{type}_confirmation_attempted")
+      current_code = record.send("_TC_#{type}_confirmation_code")
+      if attempted.is_a?(DateTime) &&
+         attempted > Time.now.utc - 60*5 &&
+         current_code.to_s.size == CONFIRMATION_CODE_LENGTH
+        current_code
+      else
+        generate_confirmation_code
+      end
+    end
     def generate_confirmation_code
       nums = (0..9).to_a
-      (0...4).collect { nums[Kernel.rand(nums.length)] }.join
+      (0...CONFIRMATION_CODE_LENGTH).collect { nums[Kernel.rand(nums.length)] }.join
     end
   end
 end
