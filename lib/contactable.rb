@@ -89,7 +89,14 @@ module TwilioContactable
       return false if _TC_phone_number.blank?
 
       format_phone_number
-      confirmation_code = TwilioContactable.generate_confirmation_code
+      confirmation_code =
+        if sms_confirmation_attempted &&
+           sms_confirmation_code &&
+           sms_confirmation_attempted > Time.now.utc - 60*5
+          sms_confirmation_code
+        else
+          TwilioContactable.generate_confirmation_code
+        end
 
       # Use this class' confirmation_message method if it
       # exists, otherwise use the generic message
@@ -118,7 +125,14 @@ module TwilioContactable
       return false if _TC_phone_number.blank?
 
       format_phone_number
-      confirmation_code = TwilioContactable.generate_confirmation_code
+      confirmation_code =
+        if voice_confirmation_attempted &&
+           voice_confirmation_code &&
+           voice_confirmation_attempted > Time.now.utc - 60*5
+          voice_confirmation_code
+        else
+          TwilioContactable.generate_confirmation_code
+        end
 
       response = TwilioContactable::Gateway.initiate_voice_call(self, _TC_formatted_phone_number)
 
