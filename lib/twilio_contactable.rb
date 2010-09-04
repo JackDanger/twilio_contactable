@@ -24,7 +24,7 @@ module TwilioContactable
     def confirmation_code(record, type)
       attempted = record.send("_TC_#{type}_confirmation_attempted")
       current_code = record.send("_TC_#{type}_confirmation_code")
-      if attempted.is_a?(DateTime) &&
+      if !attempted.blank? &&
          attempted > Time.now.utc - 60*5 &&
          current_code.to_s.size == CONFIRMATION_CODE_LENGTH
         current_code
@@ -32,6 +32,7 @@ module TwilioContactable
         generate_confirmation_code
       end
     end
+
     def generate_confirmation_code
       nums = (0..9).to_a
       (0...CONFIRMATION_CODE_LENGTH).collect { nums[Kernel.rand(nums.length)] }.join
