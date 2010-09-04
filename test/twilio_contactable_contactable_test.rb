@@ -2,8 +2,8 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 class TwilioContactableContactableTest < ActiveSupport::TestCase
 
-  Success = TwilioContactable::Gateway::Response.new(:status => :success)
-  Error   = TwilioContactable::Gateway::Response.new(:status => :error)
+  Success = TwilioContactable::Gateway::Success.new
+  Error   = TwilioContactable::Gateway::Error.new
 
   context "configuration" do
     TwilioContactable::Contactable::Attributes.each do |attr|
@@ -152,7 +152,7 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             end
           end
         end
-        context "confirming phone number with a custom short code" do
+        context "with a custom short code" do
           context "with expectations" do
             setup {
               message = "long message blah blah MYCODE blah"
@@ -172,12 +172,14 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             end
           end
         end
-        context "confirming phone number when the confirmation fails for some reason" do
+        context "when the confirmation fails for some reason" do
           setup {
             TwilioContactable::Gateway.stubs(:deliver).returns(Error)
-            @worked = @user.send_sms_confirmation!
+            @response = @user.send_sms_confirmation!
           }
-          should "not work" do assert !@worked end
+          should "not work" do
+            assert !@response.success?
+          end
           should "not save confirmation number" do
             assert @user._TC_sms_confirmation_code.blank?
           end
@@ -193,11 +195,12 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             class TestController < ActionController::Base
               include TwilioContactable::Controller
               twilio_contactable User
-              self
             end
-            @worked = @user.send_voice_confirmation!
+            @response = @user.send_voice_confirmation!
           }
-          should "work" do assert @worked end
+          should "work" do
+            assert @response.success?
+          end
           should "save confirmation number in proper attribute" do
             assert @user._TC_voice_confirmation_code
           end
@@ -211,7 +214,9 @@ class TwilioContactableContactableTest < ActiveSupport::TestCase
             assert !@user.voice_confirmed?
           end
           context "calling voice_confirm_with(right_code)" do
-            setup { @user.voice_confirm_with(@user._TC_voice_confirmation_code) }
+            setup {
+              @worked = @user.voice_confirm_with(@user._TC_voice_confirmation_code)
+            }
             should "work" do
               assert @worked
             end

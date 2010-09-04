@@ -17,16 +17,20 @@ module TwilioContactable
       end
     end
     class Response
-      def initialize(*args)
-        @options = args.last
-      end
-
-      def success?
-        :success == @options[:status]
+      def initialize(response = nil)
+        @response = response
       end
     end
-    Success = Response.new(:status => :success)
-    Error   = Response.new(:status => :error)
+    class Success < Response
+      def success?
+        true
+      end
+    end
+    class Error < Response
+      def success?
+        false
+      end
+    end
 
     API_VERSION   = '2010-04-01'
 
@@ -88,8 +92,8 @@ module TwilioContactable
           response = post service, data
  
           Net::HTTPCreated == response.code_type ?
-                                TwilioContactable::Gateway::Success :
-                                TwilioContactable::Gateway::Error
+                                TwilioContactable::Gateway::Success.new(response) :
+                                TwilioContactable::Gateway::Error.new(response)
         end
 
         def post(service, data = {})

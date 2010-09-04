@@ -105,9 +105,9 @@ module TwilioContactable
 
       if response.success?
         update_twilio_contactable_sms_confirmation confirmation_code
-      else
-        false
       end
+
+      response
     end
 
     # Begins a phone call to the user where they'll need to type
@@ -124,9 +124,9 @@ module TwilioContactable
 
       if response.success?
         update_twilio_contactable_voice_confirmation confirmation_code
-      else
-        false
       end
+
+      response
     end
 
     # Compares user-provided code with the stored confirmation
