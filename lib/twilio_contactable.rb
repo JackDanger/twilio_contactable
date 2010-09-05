@@ -1,5 +1,7 @@
 module TwilioContactable
-  CONFIRMATION_CODE_LENGTH = 4
+  unless defined?(CONFIRMATION_CODE_LENGTH)
+    CONFIRMATION_CODE_LENGTH = 4
+  end
   class << self
     def numerize(numberish)
       numberish.to_s.scan(/\d+/).join
