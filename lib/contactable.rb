@@ -101,7 +101,7 @@ module TwilioContactable
         raise ArgumentError, "SMS Confirmation Message is too long. Limit it to 160 characters of unescaped text."
       end
 
-      response = TwilioContactable::Gateway.deliver(message, _TC_phone_number)
+      response = TwilioContactable::Gateway.deliver_sms(message, _TC_formatted_phone_number)
 
       if response.success?
         update_twilio_contactable_sms_confirmation confirmation_code
